@@ -2,15 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>The Study Method — AWS ML Associate Exam</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FF9900">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ML Study">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#0f1923;--panel:#162230;--border:#2a3a4e;--text:#e0e0e0;--muted:#7a8a9e;
   --orange:#FF9900;--blue:#56b8ff;--green:#66d97a;--yellow:#f0c850;--red:#ff6b6b;--purple:#c792ea;
 }
-body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:0;margin:0}
+body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:0;margin:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .container{max-width:880px;margin:0 auto;padding:40px 24px}
 
 /* Cover */
@@ -349,5 +357,12 @@ td:first-child{color:var(--text);font-weight:600}
 </div>
 
 </div>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(e=>console.log('SW failed:',e));
+  });
+}
+</script>
 </body>
 </html>
