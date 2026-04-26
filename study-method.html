@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>The Study Method — AWS ML Associate Exam</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1923;--panel:#162230;--border:#2a3a4e;--text:#e0e0e0;--muted:#7a8a9e;
+  --orange:#FF9900;--blue:#56b8ff;--green:#66d97a;--yellow:#f0c850;--red:#ff6b6b;--purple:#c792ea;
+}
+body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:0;margin:0}
+.container{max-width:880px;margin:0 auto;padding:40px 24px}
+
+/* Cover */
+.cover{text-align:center;padding:60px 20px 50px;border-bottom:1px solid var(--border);margin-bottom:50px}
+.cover .tag{font-size:12px;text-transform:uppercase;letter-spacing:4px;color:var(--orange);margin-bottom:14px;font-weight:700}
+.cover h1{font-size:42px;font-weight:800;background:linear-gradient(135deg,var(--orange),#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:10px;line-height:1.15}
+.cover .subtitle{font-size:18px;color:var(--muted);font-weight:300;max-width:600px;margin:0 auto 20px}
+.cover .meta{font-size:13px;color:var(--muted);margin-top:24px}
+.cover .meta b{color:var(--orange)}
+
+/* Section */
+.section{margin-bottom:56px}
+.section-num{display:inline-block;font-size:12px;color:var(--orange);font-weight:700;letter-spacing:3px;margin-bottom:8px}
+h2{font-size:28px;color:var(--text);margin-bottom:14px;font-weight:700;line-height:1.2}
+h3{font-size:18px;color:var(--blue);margin:24px 0 10px;font-weight:600}
+h4{font-size:15px;color:var(--orange);margin:18px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:1px}
+p{color:#c0c8d0;margin-bottom:14px}
+.lead{font-size:17px;color:var(--text);font-weight:400}
+
+/* Callouts */
+.callout{background:var(--panel);border-left:4px solid var(--orange);border-radius:8px;padding:16px 20px;margin:20px 0}
+.callout.blue{border-left-color:var(--blue)}
+.callout.green{border-left-color:var(--green)}
+.callout.yellow{border-left-color:var(--yellow)}
+.callout-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--orange);font-weight:700;margin-bottom:6px}
+.callout.blue .callout-label{color:var(--blue)}
+.callout.green .callout-label{color:var(--green)}
+.callout.yellow .callout-label{color:var(--yellow)}
+
+/* Grids */
+.grid{display:grid;gap:16px;margin:20px 0}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:700px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:18px;transition:.2s}
+.card:hover{border-color:var(--orange);transform:translateY(-2px)}
+.card .icon{font-size:28px;margin-bottom:8px}
+.card h5{color:var(--orange);font-size:14px;margin-bottom:6px;font-weight:700}
+.card p{color:var(--muted);font-size:13px;margin:0;line-height:1.5}
+.card .example{color:#a0b0c0;font-size:12px;margin-top:8px;font-style:italic;border-top:1px solid var(--border);padding-top:8px}
+
+/* Knowledge type cards */
+.k-card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;position:relative;overflow:hidden}
+.k-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%}
+.k-card.prop::before{background:var(--orange)}
+.k-card.proc::before{background:var(--blue)}
+.k-card.cond::before{background:var(--green)}
+.k-card.tacit::before{background:var(--purple)}
+.k-card.meta::before{background:var(--yellow)}
+.k-card .k-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+.k-card h4{font-size:16px;color:var(--text);margin:0 0 4px;text-transform:none;letter-spacing:0}
+.k-card .k-desc{font-size:13px;color:var(--muted);margin-bottom:10px;font-style:italic}
+.k-card .k-tech{font-size:13px;color:#c0c8d0}
+.k-card .k-tech b{color:var(--orange)}
+.k-card.proc .k-tech b{color:var(--blue)}
+.k-card.cond .k-tech b{color:var(--green)}
+.k-card.tacit .k-tech b{color:var(--purple)}
+.k-card.meta .k-tech b{color:var(--yellow)}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13px;background:var(--panel);border-radius:8px;overflow:hidden}
+th{background:#1c2d3f;color:var(--orange);padding:10px 14px;text-align:left;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:1px}
+td{padding:10px 14px;border-top:1px solid var(--border);color:#c0c8d0}
+td:first-child{color:var(--text);font-weight:600}
+
+/* Technique in action */
+.technique{background:linear-gradient(135deg,#162230,#1a2940);border:1px solid var(--border);border-radius:12px;padding:24px;margin:20px 0}
+.technique .t-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.technique .t-icon{font-size:32px}
+.technique h3{color:var(--orange);margin:0;font-size:20px}
+.technique .t-sub{color:var(--muted);font-size:13px;font-style:italic;margin-bottom:16px}
+.technique .example-block{background:#0f1923;border:1px solid var(--border);border-radius:8px;padding:14px;margin:10px 0}
+.technique .example-block .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--green);font-weight:700;margin-bottom:6px}
+
+/* Weekly rhythm */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:20px 0}
+@media(max-width:700px){.week-grid{grid-template-columns:repeat(2,1fr)}}
+.day{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+.day .day-name{font-size:11px;color:var(--orange);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:6px}
+.day .day-activity{font-size:12px;color:#c0c8d0;line-height:1.4}
+
+/* Process flow */
+.flow{display:flex;align-items:center;gap:8px;margin:20px 0;flex-wrap:wrap;justify-content:center}
+.flow-step{background:var(--panel);border:2px solid var(--orange);border-radius:10px;padding:12px 16px;text-align:center;flex:1;min-width:140px}
+.flow-step .step-num{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:2px}
+.flow-step .step-name{font-size:13px;font-weight:700;color:var(--text);margin-top:4px}
+.flow-arrow{color:var(--orange);font-size:20px;font-weight:700}
+@media(max-width:700px){.flow-arrow{transform:rotate(90deg)}}
+
+/* Tools list */
+.tool{display:flex;gap:16px;padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:10px;align-items:flex-start}
+.tool-icon{font-size:28px;flex-shrink:0}
+.tool-content h5{color:var(--orange);font-size:15px;margin-bottom:4px}
+.tool-content p{font-size:13px;color:#c0c8d0;margin:0}
+.tool-content code{background:#0f1923;padding:2px 6px;border-radius:4px;font-size:11px;color:var(--green);font-family:'SF Mono',Menlo,monospace}
+
+/* Principles */
+.principle{background:linear-gradient(135deg,rgba(255,153,0,0.08),rgba(86,184,255,0.05));border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px;border-left:4px solid var(--orange)}
+.principle-num{font-size:32px;color:var(--orange);font-weight:800;line-height:1;float:left;margin-right:14px}
+.principle h5{color:var(--text);font-size:15px;margin-bottom:4px}
+.principle p{color:var(--muted);font-size:13px;margin:0}
+
+/* Footer */
+.footer{text-align:center;padding:40px 20px;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:60px}
+.footer b{color:var(--orange)}
+
+/* Print */
+@media print{
+  body{background:#fff;color:#000}
+  .card,.k-card,.callout,.technique,table,.principle,.day,.flow-step,.tool{background:#f5f5f5!important;color:#000!important;border-color:#ccc!important;break-inside:avoid}
+  h2,h3,h4,.card h5,.principle h5{color:#000!important}
+  .cover h1{color:#FF9900!important;-webkit-text-fill-color:#FF9900}
+  .container{padding:20px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- COVER -->
+<div class="cover">
+  <div class="tag">Evidence-based learning method</div>
+  <h1>The Study Method</h1>
+  <div class="subtitle">A cognitive science-backed framework for passing the AWS Machine Learning Associate exam — in less time, with deeper retention.</div>
+  <div class="meta">Built for <b>Don Bopearachchi</b> · AWS Certified Machine Learning — Associate (MLA-C01)</div>
+</div>
+
+<!-- PHILOSOPHY -->
+<div class="section">
+  <div class="section-num">01 · CORE IDEA</div>
+  <h2>Match the technique to the knowledge type</h2>
+  <p class="lead">Most people study the wrong way — they re-read notes and highlight textbooks. It feels productive but doesn't stick. This method is different: it matches the <em>type</em> of knowledge you're learning to the <em>technique</em> that encodes it deepest.</p>
+  <div class="callout">
+    <div class="callout-label">The Principle</div>
+    <p style="margin:0">The brain doesn't remember what you <b>read</b>. It remembers what you <b>do</b> with what you read.</p>
+  </div>
+</div>
+
+<!-- KNOWLEDGE TYPES -->
+<div class="section">
+  <div class="section-num">02 · THE FIVE KINDS OF KNOWLEDGE</div>
+  <h2>Know what you're learning, know how to learn it</h2>
+  <p>Not all exam content is the same. A service limit is different from a workflow. An algorithm name is different from "when to use it." Each requires a different tool.</p>
+
+  <div class="k-card prop">
+    <div class="k-label">Type 01</div>
+    <h4>📖 Propositional — "Know-that"</h4>
+    <div class="k-desc">Facts, definitions, service limits, numbers.</div>
+    <div class="k-tech"><b>Best tools:</b> Flashcards · Spaced Repetition · Cheat Sheets · Active Recall</div>
+  </div>
+
+  <div class="k-card proc">
+    <div class="k-label">Type 02</div>
+    <h4>🛠️ Procedural — "Know-how"</h4>
+    <div class="k-desc">Multi-step workflows, how to chain services together.</div>
+    <div class="k-tech"><b>Best tools:</b> Hands-on Labs · Process Diagrams · Teach It Out Loud · Runbooks</div>
+  </div>
+
+  <div class="k-card cond">
+    <div class="k-label">Type 03</div>
+    <h4>🧭 Conditional — "Know-when-and-why"</h4>
+    <div class="k-desc">Decision-making. Given scenario X, pick service Y. This is what the exam actually tests.</div>
+    <div class="k-tech"><b>Best tools:</b> Decision Trees · Practice Questions · Comparison Tables · Trigger-Word Maps</div>
+  </div>
+
+  <div class="k-card tacit">
+    <div class="k-label">Type 04</div>
+    <h4>✨ Tacit — "Feel-for-it"</h4>
+    <div class="k-desc">Intuition from experience. Recognizing red flags, spotting wrong answers.</div>
+    <div class="k-tech"><b>Best tools:</b> Timed Practice Exams · Post-mortem Analysis · Case Studies · Peer Discussion</div>
+  </div>
+
+  <div class="k-card meta">
+    <div class="k-label">Type 05</div>
+    <h4>🎯 Metacognitive — "Know your gaps"</h4>
+    <div class="k-desc">Awareness of what you know and what you don't. The steering wheel of studying.</div>
+    <div class="k-tech"><b>Best tools:</b> Self-Assessments · Study Journal · Confidence Tagging · Spaced Review</div>
+  </div>
+</div>
+
+<!-- ENCODING -->
+<div class="section">
+  <div class="section-num">03 · ENCODING — THE ENGINE</div>
+  <h2>How information enters long-term memory</h2>
+  <p>Encoding is the process of transforming information into memory. The deeper and more varied the encoding, the better the recall. Five encoding channels:</p>
+
+  <div class="grid cols-3">
+    <div class="card"><div class="icon">🧠</div><h5>Semantic</h5><p>Meaning-based. Connect new ideas to what you already know.</p><div class="example">"Deep Archive = 180-day minimum because AWS discourages misuse."</div></div>
+    <div class="card"><div class="icon">🔗</div><h5>Elaborative</h5><p>Ask "why" and "how" for every fact.</p><div class="example">"Why does this exist? What problem does it solve?"</div></div>
+    <div class="card"><div class="icon">🖼️</div><h5>Visual</h5><p>Diagrams, spatial layouts, mental models.</p><div class="example">The filing-cabinet model for S3 storage classes.</div></div>
+    <div class="card"><div class="icon">🔊</div><h5>Acoustic</h5><p>Rhymes, mnemonics, absurd sentences.</p><div class="example">"Glacier Deep, six months to keep."</div></div>
+    <div class="card"><div class="icon">✋</div><h5>Kinesthetic</h5><p>Physical action — clicking, typing, building.</p><div class="example">Actually deploying a model in SageMaker Studio.</div></div>
+    <div class="card" style="background:linear-gradient(135deg,#1a3a2a,#1e4035);border-color:var(--green)"><div class="icon">⚡</div><h5 style="color:var(--green)">The Multiplier</h5><p>Using 2+ channels for the same concept = 10x retention.</p><div class="example" style="color:#a0c0a0">This is called "dual coding."</div></div>
+  </div>
+</div>
+
+<!-- TECHNIQUES IN ACTION -->
+<div class="section">
+  <div class="section-num">04 · THE ARSENAL</div>
+  <h2>Eight techniques that actually work</h2>
+  <p>Evidence-based, ranked by ROI for certification exams:</p>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🎙️</span><h3>1. Feynman Technique</h3></div>
+    <div class="t-sub">Semantic + Elaborative encoding. Best for: complex concepts you think you understand.</div>
+    <p><b>Pick a concept → explain it to a 12-year-old → find gaps → refine → add analogy.</b> The moment you can't explain it simply is the moment you learn you don't actually understand it.</p>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🔍</span><h3>2. Elaborative Interrogation</h3></div>
+    <div class="t-sub">For every fact, ask WHY and HOW.</div>
+    <div class="example-block">
+      <div class="label">Example — S3 Deep Archive has a 180-day minimum</div>
+      <p style="margin:0;font-size:13px"><b>Why does it exist at all?</b> → AWS has to amortize the cost of moving data to cold media.<br><b>Why 180 specifically?</b> → The slowest media; longer commitment is needed to break even.<br><b>What does this tell me?</b> → Only use it for data I truly won't need for 6+ months.</p>
+    </div>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">📦</span><h3>3. Chunking</h3></div>
+    <div class="t-sub">Group related items into meaningful clusters.</div>
+    <table style="margin-top:10px">
+      <thead><tr><th>🔥 Hot</th><th>🌡️ Warm</th><th>❄️ Cold</th></tr></thead>
+      <tbody>
+        <tr><td>Standard</td><td>Standard-IA</td><td>Glacier Instant</td></tr>
+        <tr><td>Intelligent-Tiering</td><td>One Zone-IA</td><td>Glacier Flexible</td></tr>
+        <tr><td></td><td></td><td>Deep Archive</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:13px;color:var(--muted);margin-top:6px">Three chunks is easier to hold than seven items. Each chunk has its own rules.</p>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🔀</span><h3>4. Interleaving</h3></div>
+    <div class="t-sub">Mix topics. Forces your brain to discriminate between concepts — which is exactly what the exam tests.</div>
+    <div class="grid cols-2">
+      <div class="card" style="border-color:var(--red)"><h5 style="color:var(--red)">❌ Blocked (Bad)</h5><p>2 hours on Domain 1, then 2 hours on Domain 2, then 2 hours on Domain 3.</p></div>
+      <div class="card" style="border-color:var(--green)"><h5 style="color:var(--green)">✅ Interleaved (Good)</h5><p>15 min D1, 15 min D3, 15 min D2, 15 min D4. Repeat.</p></div>
+    </div>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🎭</span><h3>5. Mnemonics</h3></div>
+    <div class="t-sub">Encode arbitrary facts using sound, imagery, or absurdity.</div>
+    <p style="font-size:13px"><b>Handling Missing Data:</b> "Don't Ignore Missing Features Intentionally" → <b>D</b>rop · <b>I</b>mpute · <b>M</b>odel · <b>F</b>ill · <b>I</b>ndicator</p>
+    <p style="font-size:13px"><b>Pipeline Steps:</b> "People Train Carefully, Release Models" → <b>P</b>rocessing · <b>T</b>raining · <b>C</b>ondition · <b>R</b>egister · <b>M</b>odel</p>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🗺️</span><h3>6. Concept Maps</h3></div>
+    <div class="t-sub">Nodes + labeled arrows. Train relationships, not lists.</div>
+    <p>The exam tests <em>relationships</em>, not isolated facts. "If X, then Y" is a relationship question. Concept maps with labeled arrows like "detected by," "caused by," "responds to" train exactly that thinking.</p>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🎨</span><h3>7. Dual Coding</h3></div>
+    <div class="t-sub">Written explanation + visual diagram. Two channels = deeper memory.</div>
+    <p><b>The rule:</b> Every architecture concept gets a diagram. Every diagram gets a written paragraph. Never one without the other.</p>
+  </div>
+
+  <div class="technique">
+    <div class="t-header"><span class="t-icon">🎯</span><h3>8. Retrieval Practice</h3></div>
+    <div class="t-sub">Close everything. Write what you know. The struggle is the learning.</div>
+    <p>Struggling to recall strengthens the memory more than easy recall. Getting it wrong and correcting it is <em>better</em> than getting it right. Pair with spaced repetition.</p>
+  </div>
+</div>
+
+<!-- THE 45-MIN SESSION -->
+<div class="section">
+  <div class="section-num">05 · THE 45-MINUTE PROTOCOL</div>
+  <h2>A single study session, done right</h2>
+  <p>One topic, five techniques, five different encoding pathways.</p>
+  <div class="flow">
+    <div class="flow-step"><div class="step-num">0–5 MIN</div><div class="step-name">Retrieval Practice</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="step-num">5–15 MIN</div><div class="step-name">Elaborative Interrogation</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="step-num">15–25 MIN</div><div class="step-name">Dual Coding</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="step-num">25–35 MIN</div><div class="step-name">Feynman</div></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step"><div class="step-num">35–45 MIN</div><div class="step-name">Interleaved Qs</div></div>
+  </div>
+  <p style="font-size:13px;color:var(--muted);text-align:center;margin-top:10px"><em>End of session: the topic is encoded through five pathways. You'll remember it in two weeks.</em></p>
+</div>
+
+<!-- WEEKLY RHYTHM -->
+<div class="section">
+  <div class="section-num">06 · WEEKLY RHYTHM</div>
+  <h2>A sustainable pace</h2>
+  <p>One sub-domain per week. Rotate the activity type daily to hit every knowledge type.</p>
+  <div class="week-grid">
+    <div class="day"><div class="day-name">Mon</div><div class="day-activity">Read new sub-domain<br><small style="color:var(--muted)">Propositional</small></div></div>
+    <div class="day"><div class="day-name">Tue</div><div class="day-activity">Build flashcards<br><small style="color:var(--muted)">Propositional</small></div></div>
+    <div class="day"><div class="day-name">Wed</div><div class="day-activity">Hands-on lab<br><small style="color:var(--muted)">Procedural</small></div></div>
+    <div class="day"><div class="day-name">Thu</div><div class="day-activity">Decision trees + tables<br><small style="color:var(--muted)">Conditional</small></div></div>
+    <div class="day"><div class="day-name">Fri</div><div class="day-activity">20 practice questions<br><small style="color:var(--muted)">Conditional + Tacit</small></div></div>
+    <div class="day"><div class="day-name">Sat</div><div class="day-activity">Review wrong answers<br><small style="color:var(--muted)">Metacognitive</small></div></div>
+    <div class="day"><div class="day-name">Sun</div><div class="day-activity">Flashcard review<br><small style="color:var(--muted)">Spaced repetition</small></div></div>
+  </div>
+</div>
+
+<!-- TOOLS -->
+<div class="section">
+  <div class="section-num">07 · YOUR TOOLKIT</div>
+  <h2>The tools you already have</h2>
+  <div class="tool"><span class="tool-icon">🎯</span><div class="tool-content"><h5>Retrieval Practice App</h5><p>Random topic → 3-min timer → brain-dump → compare → rate yourself. Tracks weak spots.<br><code>~/Documents/retrieval-practice.html</code></p></div></div>
+  <div class="tool"><span class="tool-icon">🎙️</span><div class="tool-content"><h5>Feynman Template</h5><p>Interactive 5-step worksheet. Auto-saves. Exports to markdown.<br><code>~/Documents/feynman-template.html</code></p></div></div>
+  <div class="tool"><span class="tool-icon">🃏</span><div class="tool-content"><h5>S3 Storage Flashcards</h5><p>25 cards covering all storage classes. Mobile-optimized. Spaced repetition.<br><code>~/Documents/s3-storage-flashcards.html</code></p></div></div>
+  <div class="tool"><span class="tool-icon">🗂️</span><div class="tool-content"><h5>Domain 1 Concept Map</h5><p>Mind map linking ingestion, storage, transformation, orchestration, security. Open in draw.io.</p></div></div>
+  <div class="tool"><span class="tool-icon">📊</span><div class="tool-content"><h5>3 V's of Big Data Visualization</h5><p>Volume, Velocity, Variety mapped to AWS services.<br><code>~/Documents/3vs-big-data.html</code></p></div></div>
+</div>
+
+<!-- PRINCIPLES -->
+<div class="section">
+  <div class="section-num">08 · THE PRINCIPLES</div>
+  <h2>Ten rules to remember</h2>
+  <div class="principle"><span class="principle-num">01</span><h5>Re-reading is not studying</h5><p>It feels productive. It isn't. Retrieval and production are what encode.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">02</span><h5>Match the technique to the knowledge type</h5><p>Facts need flashcards. Workflows need labs. Decisions need practice questions.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">03</span><h5>Ask "why" for every fact</h5><p>Elaborative interrogation turns arbitrary numbers into reasoned knowledge.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">04</span><h5>Use two encoding channels per concept</h5><p>Written + visual. Or verbal + kinesthetic. Never just one.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">05</span><h5>Interleave, don't block</h5><p>Mixing domains in one session feels harder — and it is. That's the point.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">06</span><h5>Struggle is the signal</h5><p>When retrieval is hard, encoding is happening. Don't avoid the discomfort.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">07</span><h5>Teach it, or you don't know it</h5><p>If you can't explain it to a 12-year-old, you haven't learned it yet.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">08</span><h5>Space your reviews</h5><p>1 day → 3 days → 1 week → 2 weeks. Forgetting is part of learning.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">09</span><h5>Track your gaps</h5><p>You can only fix what you can see. Log weak topics. Revisit them.</p><div style="clear:both"></div></div>
+  <div class="principle"><span class="principle-num">10</span><h5>Trust the process</h5><p>This method feels slower. The retention is dramatically higher. Stay the course.</p><div style="clear:both"></div></div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>This document is based on cognitive science research from <b>Barbara Oakley</b>, <b>Robert Bjork</b>, <b>Peter Brown</b> (<em>Make It Stick</em>), <b>Anders Ericsson</b>, and <b>Richard Feynman</b>.</p>
+  <p style="margin-top:10px">Built for the <b>AWS Certified Machine Learning — Associate (MLA-C01)</b> exam. The method generalizes to any certification.</p>
+  <p style="margin-top:16px;color:var(--orange);font-weight:700">Print this page or save as PDF for offline reference.</p>
+</div>
+
+</div>
+</body>
+</html>
