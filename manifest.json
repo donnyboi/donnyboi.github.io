@@ -2,7 +2,7 @@
   "name": "ML Study Method",
   "short_name": "ML Study",
   "description": "AWS Machine Learning Associate exam study companion",
-  "start_url": "/study-method.html",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1923",

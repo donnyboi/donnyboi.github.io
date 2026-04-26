@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S3 Storage Classes — Flashcards</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;display:flex;flex-direction:column;align-items:center;min-height:100vh;min-height:-webkit-fill-available;padding:20px 16px;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+h1{color:#FF9900;font-size:20px;margin-bottom:4px}
+.sub{color:#7a8a9e;font-size:12px;margin-bottom:18px;text-align:center}
+.progress{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;max-width:100%}
+.dot{width:10px;height:10px;border-radius:50%;background:#1c2d3f;border:1px solid #2e4058;transition:.3s}
+.dot.active{background:#FF9900;border-color:#FF9900}
+.dot.correct{background:#66d97a;border-color:#66d97a}
+.dot.incorrect{background:#ff6b6b;border-color:#ff6b6b}
+.card-container{perspective:1000px;width:100%;max-width:560px;height:280px;margin-bottom:16px;cursor:pointer}
+.card{width:100%;height:100%;position:relative;transition:transform .5s;transform-style:preserve-3d}
+.card.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.front{background:linear-gradient(135deg,#1a2940,#1e3350);border:2px solid #FF9900}
+.back{background:linear-gradient(135deg,#1a3a2a,#1e4035);border:2px solid #66d97a;transform:rotateY(180deg)}
+.card-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#FF9900;margin-bottom:10px;flex-shrink:0}
+.back .card-label{color:#66d97a}
+.card-question{font-size:17px;font-weight:700;line-height:1.4}
+.card-answer{font-size:14px;line-height:1.6}
+.card-answer b{color:#FF9900}
+.card-answer .highlight{color:#66d97a;font-weight:600}
+.hint{font-size:11px;color:#5a6a7e;margin-top:12px;font-style:italic;flex-shrink:0}
+.controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:560px}
+button{background:#1c2d3f;border:1px solid #2e4058;color:#e0e0e0;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;transition:.2s;-webkit-user-select:none;user-select:none}
+button:active{background:#2a3a4e;border-color:#FF9900}
+.btn-primary{background:#FF9900;color:#000;font-weight:700;border-color:#FF9900}
+.btn-primary:active{background:#e88a00}
+.score{color:#7a8a9e;font-size:13px;margin-bottom:6px}
+.tracker{display:flex;gap:16px;margin-bottom:12px}
+.tracker span{font-size:13px}
+.tracker .right{color:#66d97a}
+.tracker .wrong{color:#ff6b6b}
+.shuffle-note{color:#5a6a7e;font-size:11px}
+@media(max-width:430px){
+  body{padding:16px 12px}
+  h1{font-size:18px}
+  .card-container{height:260px}
+  .card-face{padding:16px}
+  .card-question{font-size:16px}
+  .card-answer{font-size:13px}
+  .controls{gap:6px}
+  button{padding:10px 12px;font-size:13px;flex:1;min-width:0}
+}
+</style>
+</head>
+<body>
+<h1>S3 Storage Classes — Flashcards</h1>
+<div class="sub">Click card to flip · Arrow keys or buttons to navigate</div>
+
+<div class="progress" id="progress"></div>
+<div class="score" id="score">Card 1 of 25</div>
+<div class="tracker">
+  <span class="right" id="rightCount">✓ 0</span>
+  <span class="wrong" id="wrongCount">✗ 0</span>
+</div>
+
+<div class="card-container" id="cardContainer">
+  <div class="card" id="card">
+    <div class="card-face front">
+      <div class="card-label">Question</div>
+      <div class="card-question" id="question"></div>
+      <div class="hint">Click to reveal answer</div>
+    </div>
+    <div class="card-face back">
+      <div class="card-label">Answer</div>
+      <div class="card-answer" id="answer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="markCard('incorrect')">✗ Didn't Know</button>
+  <button onclick="markCard('correct')">✓ Got It</button>
+  <button onclick="next()">Next →</button>
+</div>
+<button class="btn-primary" onclick="shuffle()">🔀 Shuffle & Reset</button>
+<div class="shuffle-note">Shuffle to randomize card order</div>
+
+<script>
+const cards=[
+{q:"How many S3 storage classes are there?",a:"<b>7 classes:</b> Standard, Intelligent-Tiering, Standard-IA, One Zone-IA, Glacier Instant Retrieval, Glacier Flexible Retrieval, Glacier Deep Archive"},
+{q:"Which storage class should you use when access patterns are unknown or changing?",a:"<b>S3 Intelligent-Tiering</b> — auto-moves objects between tiers based on usage. No retrieval fee, just a small monthly monitoring fee."},
+{q:"What is the minimum storage duration for Glacier Deep Archive?",a:"<b>180 days</b> — you pay for 180 days even if you delete the object after 1 day."},
+{q:"What is the retrieval time for Glacier Deep Archive?",a:"<b>Standard: 12 hours</b><br><b>Bulk: 48 hours</b><br>The slowest and cheapest class."},
+{q:"Which storage class stores data in only ONE Availability Zone?",a:"<b>S3 One Zone-IA</b> — cheaper than Standard-IA but no resilience to AZ failure. Only use for <span class='highlight'>reproducible data</span>."},
+{q:"What is the availability of S3 Standard vs One Zone-IA?",a:"<b>Standard: 99.99%</b><br><b>One Zone-IA: 99.5%</b><br>One Zone-IA trades availability for lower cost."},
+{q:"What are the three retrieval speeds for Glacier Flexible Retrieval?",a:"<b>Expedited:</b> 1–5 minutes<br><b>Standard:</b> 3–5 hours<br><b>Bulk:</b> 5–12 hours"},
+{q:"What is the minimum storage duration for Standard-IA and One Zone-IA?",a:"<b>30 days</b> for both. Delete before 30 days? You still pay for the full 30."},
+{q:"What is the minimum storage duration for Glacier Instant Retrieval?",a:"<b>90 days</b> — same as Glacier Flexible Retrieval."},
+{q:"Which Glacier class gives millisecond retrieval?",a:"<b>Glacier Instant Retrieval</b> — archive pricing with instant access. Ideal for data accessed ~once per quarter."},
+{q:"What is the fundamental cost tradeoff across S3 storage classes?",a:"<span class='highlight'>Cheaper storage = more expensive/slower retrieval</span><br><br>Standard has no retrieval fee but highest storage cost. Deep Archive has cheapest storage but highest retrieval cost and time."},
+{q:"Does S3 Intelligent-Tiering charge a retrieval fee?",a:"<b>No retrieval fee.</b> It charges a small monthly <span class='highlight'>monitoring and automation fee</span> per object instead."},
+{q:"What tiers does Intelligent-Tiering automatically move objects between?",a:"<b>5 tiers:</b> Frequent Access, Infrequent Access, Archive Instant Access, Archive Access, Deep Archive Access.<br><br>First two are automatic. Last two are opt-in."},
+{q:"Which storage class would you use for ML training data that's accessed daily?",a:"<b>S3 Standard</b> — frequent access, no retrieval fee, highest availability (99.99%)."},
+{q:"Which storage class for compliance data that must be kept 7+ years?",a:"<b>Glacier Deep Archive</b> — cheapest storage, 180-day minimum, retrieval in 12–48 hours. Perfect for regulatory retention."},
+{q:"What AWS feature automates transitions between storage classes?",a:"<b>S3 Lifecycle Policies</b><br><br>Example: Standard → Standard-IA (30 days) → Glacier (90 days) → Deep Archive (365 days)"},
+{q:"A question mentions 'infrequent access' and 'data can be recreated'. Which class?",a:"<b>S3 One Zone-IA</b> — cheapest IA option because single AZ. Safe only when data is <span class='highlight'>reproducible</span>."},
+{q:"A question mentions 'unpredictable traffic pattern'. Which class?",a:"<b>S3 Intelligent-Tiering</b> — it adapts automatically. No penalty for guessing wrong about access patterns."},
+{q:"What is the availability of S3 Standard-IA?",a:"<b>99.9%</b> — slightly lower than Standard (99.99%) but still high. The 'IA' saves on storage cost."},
+{q:"Filing cabinet mental model: What is S3 Standard?",a:"<b>Your desk</b> — everything within arm's reach, instant access, most expensive real estate."},
+{q:"Filing cabinet mental model: What is Glacier Deep Archive?",a:"<b>The deep vault</b> — cheapest storage possible, but takes up to 12 hours to retrieve. You almost never go there."},
+{q:"Filing cabinet mental model: What is S3 Intelligent-Tiering?",a:"<b>A smart desk</b> — automatically moves papers between your desk and drawer based on how often you use them."},
+{q:"Which storage classes have NO minimum storage duration charge?",a:"<b>S3 Standard</b> and <b>S3 Intelligent-Tiering</b> — all others charge for a minimum period (30, 90, or 180 days)."},
+{q:"Which storage classes have NO retrieval fee?",a:"<b>S3 Standard</b> and <b>S3 Intelligent-Tiering</b> — all IA and Glacier classes charge per-GB retrieval fees."},
+{q:"Order the storage classes from most expensive to cheapest (per GB stored).",a:"<b>Standard</b> → Standard-IA → One Zone-IA → Glacier Instant → Glacier Flexible → <b>Deep Archive</b><br><br>Retrieval cost goes in the <span class='highlight'>opposite direction</span>."}
+];
+
+let current=0,right=0,wrong=0,results=[];
+
+function init(){
+  results=cards.map(()=>null);
+  renderDots();
+  show();
+}
+
+function renderDots(){
+  const p=document.getElementById('progress');
+  p.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===current?' active':'')+(results[i]==='correct'?' correct':'')+(results[i]==='incorrect'?' incorrect':'');
+    d.onclick=()=>{current=i;unflip();show()};
+    p.appendChild(d);
+  });
+}
+
+function show(){
+  document.getElementById('question').innerHTML=cards[current].q;
+  document.getElementById('answer').innerHTML=cards[current].a;
+  document.getElementById('score').textContent=`Card ${current+1} of ${cards.length}`;
+  document.getElementById('rightCount').textContent=`✓ ${right}`;
+  document.getElementById('wrongCount').textContent=`✗ ${wrong}`;
+  renderDots();
+}
+
+function unflip(){document.getElementById('card').classList.remove('flipped')}
+
+document.getElementById('cardContainer').onclick=()=>{
+  document.getElementById('card').classList.toggle('flipped');
+};
+
+function next(){
+  if(current<cards.length-1){current++;unflip();show()}
+}
+function prev(){
+  if(current>0){current--;unflip();show()}
+}
+
+function markCard(result){
+  if(results[current]===null){
+    if(result==='correct')right++;else wrong++;
+  }else{
+    if(results[current]==='correct'&&result==='incorrect'){right--;wrong++}
+    if(results[current]==='incorrect'&&result==='correct'){wrong--;right++}
+  }
+  results[current]=result;
+  show();
+  if(current<cards.length-1)setTimeout(()=>{next()},300);
+}
+
+function shuffle(){
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]]}
+  current=0;right=0;wrong=0;results=cards.map(()=>null);unflip();show();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')next();
+  if(e.key==='ArrowLeft')prev();
+  if(e.key===' '){e.preventDefault();document.getElementById('card').classList.toggle('flipped')}
+});
+
+let touchStartX=0,touchStartY=0;
+document.getElementById('cardContainer').addEventListener('touchstart',e=>{
+  touchStartX=e.changedTouches[0].screenX;
+  touchStartY=e.changedTouches[0].screenY;
+},{passive:true});
+document.getElementById('cardContainer').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].screenX-touchStartX;
+  const dy=e.changedTouches[0].screenY-touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
+    if(dx<0)next();else prev();
+    e.preventDefault();
+  }
+});
+
+init();
+</script>
+</body>
+</html>

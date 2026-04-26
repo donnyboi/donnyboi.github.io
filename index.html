@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>ML Study Hub</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#FF9900">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ML Study">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);min-height:100vh;min-height:-webkit-fill-available;-webkit-tap-highlight-color:transparent}
+.container{max-width:720px;margin:0 auto;padding:32px 0 40px}
+.hero{text-align:center;margin-bottom:32px}
+.hero .tag{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:#FF9900;font-weight:700;margin-bottom:8px}
+.hero h1{font-size:32px;font-weight:800;background:linear-gradient(135deg,#FF9900,#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;line-height:1.1}
+.hero p{color:#7a8a9e;font-size:14px}
+.section-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#7a8a9e;font-weight:700;margin:24px 0 12px;padding-left:4px}
+.tile{display:flex;align-items:center;gap:14px;background:#162230;border:1px solid #2a3a4e;border-radius:14px;padding:16px 18px;margin-bottom:10px;text-decoration:none;color:inherit;transition:.2s;border-left:4px solid transparent}
+.tile:active{background:#1c2d3f;transform:scale(0.98)}
+.tile:hover{border-left-color:#FF9900;border-color:#2a3a4e}
+.tile-icon{font-size:32px;flex-shrink:0;width:48px;text-align:center}
+.tile-content{flex:1;min-width:0}
+.tile-title{font-size:15px;font-weight:700;color:#e0e0e0;margin-bottom:2px}
+.tile-desc{font-size:12px;color:#7a8a9e;line-height:1.4}
+.tile-arrow{color:#FF9900;font-size:20px;flex-shrink:0}
+.tile.primary{background:linear-gradient(135deg,#1a2940,#1e3350);border:2px solid #FF9900}
+.tile.primary .tile-title{color:#FF9900}
+.tile.primary .tile-desc{color:#a0b0c0}
+.footer{text-align:center;margin-top:32px;padding:20px;font-size:12px;color:#5a6a7e}
+.footer a{color:#FF9900;text-decoration:none}
+@media(max-width:430px){
+  .hero h1{font-size:26px}
+  .tile{padding:14px}
+  .tile-icon{font-size:28px;width:40px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <div class="tag">AWS ML Associate</div>
+    <h1>ML Study Hub</h1>
+    <p>Your exam prep toolkit — always in your pocket</p>
+  </div>
+
+  <div class="section-label">📘 Start Here</div>
+  <a class="tile primary" href="study-method.html">
+    <div class="tile-icon">🧠</div>
+    <div class="tile-content">
+      <div class="tile-title">The Study Method</div>
+      <div class="tile-desc">Cognitive-science-backed framework · read this first</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+
+  <div class="section-label">🎯 Practice Tools</div>
+  <a class="tile" href="retrieval-practice.html">
+    <div class="tile-icon">🎯</div>
+    <div class="tile-content">
+      <div class="tile-title">Retrieval Practice</div>
+      <div class="tile-desc">Random topic · 3-min timer · brain-dump · compare</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+  <a class="tile" href="feynman-template.html">
+    <div class="tile-icon">🎙️</div>
+    <div class="tile-content">
+      <div class="tile-title">Feynman Template</div>
+      <div class="tile-desc">5-step worksheet · explain it simply · find the gaps</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+  <a class="tile" href="s3-storage-flashcards.html">
+    <div class="tile-icon">🃏</div>
+    <div class="tile-content">
+      <div class="tile-title">S3 Storage Flashcards</div>
+      <div class="tile-desc">25 cards · swipe to navigate · track your progress</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+
+  <div class="section-label">📊 Visualizations</div>
+  <a class="tile" href="3vs-big-data.html">
+    <div class="tile-icon">📊</div>
+    <div class="tile-content">
+      <div class="tile-title">3 V's of Big Data</div>
+      <div class="tile-desc">Volume · Velocity · Variety · mapped to AWS services</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+  <a class="tile" href="agent-registry-diagram.html">
+    <div class="tile-icon">🗂️</div>
+    <div class="tile-content">
+      <div class="tile-title">Agent Registry Architecture</div>
+      <div class="tile-desc">How AWS Agent Registry works · end-to-end flow</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+
+  <div class="footer">
+    <p>Built for <a href="https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/" target="_blank">AWS MLA-C01</a></p>
+    <p style="margin-top:6px">Add to Home Screen for the app experience</p>
+  </div>
+</div>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
