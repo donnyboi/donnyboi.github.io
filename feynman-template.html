@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Feynman Practice Template</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;padding:30px;max-width:900px;margin:0 auto;line-height:1.6}
+h1{color:#FF9900;font-size:26px;margin-bottom:4px}
+.sub{color:#7a8a9e;font-size:14px;margin-bottom:24px}
+.step{background:#162230;border:1px solid #2a3a4e;border-left:4px solid #FF9900;border-radius:10px;padding:20px;margin-bottom:16px}
+.step-num{display:inline-block;background:#FF9900;color:#000;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700;margin-right:10px;font-size:13px}
+.step h2{display:inline-block;color:#FF9900;font-size:17px;vertical-align:middle}
+.step-desc{color:#a0b0c0;font-size:13px;margin:8px 0 12px 38px;font-style:italic}
+label{display:block;color:#7a8a9e;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:10px}
+textarea,input{width:100%;background:#0f1923;border:1px solid #2a3a4e;color:#e0e0e0;padding:10px;border-radius:6px;font-family:inherit;font-size:14px;line-height:1.5;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:#FF9900}
+textarea{min-height:80px}
+.hint{background:#1a2940;border-left:3px solid #56b8ff;padding:10px 14px;margin-top:10px;border-radius:4px;font-size:13px;color:#a0c4e0}
+.hint b{color:#56b8ff}
+.controls{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+button{background:#FF9900;color:#000;border:none;padding:12px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-size:14px}
+button:hover{background:#e88a00}
+button.secondary{background:#2a3a4e;color:#e0e0e0}
+button.secondary:hover{background:#3a4a5e}
+.worked-example{background:#1a3a2a;border:1px solid #66d97a;border-radius:10px;padding:16px;margin:20px 0;font-size:13px}
+.worked-example h3{color:#66d97a;font-size:14px;margin-bottom:10px}
+.worked-example p{color:#c0d0c0;margin-bottom:8px}
+.worked-example b{color:#66d97a}
+.toggle-example{background:transparent;color:#66d97a;border:1px solid #66d97a;padding:8px 14px;font-size:13px;font-weight:600}
+.toggle-example:hover{background:#1a3a2a}
+.examples{display:none}
+.examples.show{display:block}
+</style>
+</head>
+<body>
+<h1>🧠 Feynman Technique Practice</h1>
+<div class="sub">Pick a concept. Explain it simply. Find the gaps. Refine.</div>
+
+<button class="toggle-example" onclick="document.getElementById('examples').classList.toggle('show')">Show worked example ▼</button>
+
+<div class="examples" id="examples">
+  <div class="worked-example">
+    <h3>✅ Worked Example: "SageMaker Model Monitor"</h3>
+    <p><b>Step 1:</b> SageMaker Model Monitor</p>
+    <p><b>Step 2 (simple explanation):</b> "It's a watchdog for your deployed ML models. It checks if the data coming into your model today looks like the data you trained it on. If things drift too far, it raises an alarm so you know to retrain."</p>
+    <p><b>Step 3 (gaps I found):</b> I said "things drift" but I didn't explain WHAT drifts. There are 4 types of monitors, not one. I don't actually understand how baselines work.</p>
+    <p><b>Step 4 (refined):</b> "Model Monitor compares live production data against a baseline captured from training. There are 4 flavors: data quality (input stats), model quality (prediction accuracy vs ground truth), bias drift (fairness), and feature attribution (which features matter). Each one detects a different kind of decay."</p>
+    <p><b>Step 5 (analogy):</b> "Like a car's check-engine light — but instead of monitoring the engine, it monitors whether the world your model was trained to predict still looks the same."</p>
+  </div>
+</div>
+
+<div class="step">
+  <span class="step-num">1</span><h2>Pick a concept</h2>
+  <div class="step-desc">Choose ONE specific concept. Not a whole domain. Be narrow.</div>
+  <label>Concept name</label>
+  <input type="text" id="concept" placeholder="e.g., SageMaker Multi-Model Endpoints, Parquet file format, Canary deployment">
+</div>
+
+<div class="step">
+  <span class="step-num">2</span><h2>Explain it simply</h2>
+  <div class="step-desc">Write it as if explaining to a smart 12-year-old. No jargon. Use analogies.</div>
+  <label>Your explanation</label>
+  <textarea id="explain" placeholder="Write freely. Don't look anything up yet. Use your own words only."></textarea>
+  <div class="hint"><b>Test yourself:</b> Did you use any words you couldn't define if asked? Those are gaps.</div>
+</div>
+
+<div class="step">
+  <span class="step-num">3</span><h2>Find the gaps</h2>
+  <div class="step-desc">Where did you get stuck? What did you hand-wave? What terms did you borrow without understanding?</div>
+  <label>Gaps and weak spots</label>
+  <textarea id="gaps" placeholder="e.g., &#10;- I said 'auto-scaling' but I don't know WHEN it triggers&#10;- I used the word 'artifact' without understanding what it actually contains&#10;- I couldn't explain the difference between this and the alternative"></textarea>
+  <div class="hint"><b>Go study:</b> Now open the docs/notes. Fill in ONLY the gaps you identified.</div>
+</div>
+
+<div class="step">
+  <span class="step-num">4</span><h2>Refine and simplify</h2>
+  <div class="step-desc">Rewrite the explanation. Use the new knowledge. Keep it simple.</div>
+  <label>Refined explanation</label>
+  <textarea id="refine" placeholder="Rewrite it. Shorter, clearer, more accurate."></textarea>
+</div>
+
+<div class="step">
+  <span class="step-num">5</span><h2>Find the analogy</h2>
+  <div class="step-desc">Connect it to something you already know well. Analogy = permanent encoding.</div>
+  <label>"This is like..."</label>
+  <textarea id="analogy" placeholder="e.g., 'This is like...' and complete it with something from your everyday life."></textarea>
+</div>
+
+<div class="controls">
+  <button onclick="save()">💾 Save to file</button>
+  <button class="secondary" onclick="clearAll()">🗑 Clear</button>
+  <button class="secondary" onclick="loadSaved()">📂 Load last</button>
+</div>
+
+<script>
+const fields=['concept','explain','gaps','refine','analogy'];
+
+function save(){
+  const data={};
+  fields.forEach(f=>data[f]=document.getElementById(f).value);
+  const c=data.concept||'untitled';
+  const content=`# Feynman: ${c}\n\nDate: ${new Date().toLocaleDateString()}\n\n## 1. Concept\n${data.concept}\n\n## 2. Simple Explanation\n${data.explain}\n\n## 3. Gaps Found\n${data.gaps}\n\n## 4. Refined Explanation\n${data.refine}\n\n## 5. Analogy\n${data.analogy}\n`;
+  const blob=new Blob([content],{type:'text/markdown'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`feynman-${c.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.md`;
+  a.click();
+  localStorage.setItem('feynman',JSON.stringify(data));
+}
+
+function clearAll(){
+  if(confirm('Clear all fields?'))fields.forEach(f=>document.getElementById(f).value='');
+}
+
+function loadSaved(){
+  const saved=localStorage.getItem('feynman');
+  if(!saved){alert('No saved session found');return}
+  const data=JSON.parse(saved);
+  fields.forEach(f=>document.getElementById(f).value=data[f]||'');
+}
+
+// Auto-save to localStorage
+fields.forEach(f=>{
+  document.getElementById(f).addEventListener('input',()=>{
+    const data={};
+    fields.forEach(ff=>data[ff]=document.getElementById(ff).value);
+    localStorage.setItem('feynman',JSON.stringify(data));
+  });
+});
+
+// Load on start
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('feynman');
+  if(saved){const data=JSON.parse(saved);fields.forEach(f=>document.getElementById(f).value=data[f]||'')}
+});
+</script>
+</body>
+</html>
