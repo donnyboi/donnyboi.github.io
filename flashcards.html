@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Flashcard Decks</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);min-height:100vh;min-height:-webkit-fill-available;-webkit-tap-highlight-color:transparent}
+.container{max-width:720px;margin:0 auto;padding:20px 0 40px}
+.back-link{color:#7a8a9e;text-decoration:none;font-size:13px;display:inline-block;margin-bottom:16px}
+.back-link:hover{color:#FF9900}
+.hero{margin-bottom:24px}
+.hero .tag{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:#FF9900;font-weight:700;margin-bottom:8px}
+.hero h1{font-size:28px;font-weight:800;color:#FF9900;margin-bottom:8px}
+.hero p{color:#7a8a9e;font-size:14px}
+.tile{display:flex;align-items:center;gap:14px;background:#162230;border:1px solid #2a3a4e;border-radius:14px;padding:16px 18px;margin-bottom:10px;text-decoration:none;color:inherit;transition:.2s;border-left:4px solid transparent}
+.tile:active{background:#1c2d3f;transform:scale(0.98)}
+.tile:hover{border-left-color:#FF9900}
+.tile-icon{font-size:32px;flex-shrink:0;width:48px;text-align:center}
+.tile-content{flex:1;min-width:0}
+.tile-title{font-size:15px;font-weight:700;color:#e0e0e0;margin-bottom:2px}
+.tile-desc{font-size:12px;color:#7a8a9e;line-height:1.4}
+.tile-meta{font-size:11px;color:#FF9900;margin-top:4px;font-weight:600}
+.tile-arrow{color:#FF9900;font-size:20px;flex-shrink:0}
+.coming-soon{opacity:0.5;pointer-events:none}
+.coming-soon .tile-meta{color:#7a8a9e}
+@media(max-width:430px){
+  .hero h1{font-size:24px}
+  .tile{padding:14px}
+  .tile-icon{font-size:28px;width:40px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back-link" href="index.html">‹ Hub</a>
+  <div class="hero">
+    <div class="tag">🃏 Flashcard decks</div>
+    <h1>Choose a deck</h1>
+    <p>Tap to flip · swipe or arrow keys to navigate · mark each card as known or not</p>
+  </div>
+
+  <a class="tile" href="s3-storage-flashcards.html">
+    <div class="tile-icon">🪣</div>
+    <div class="tile-content">
+      <div class="tile-title">S3 Storage Classes</div>
+      <div class="tile-desc">Every class, minimum duration, retrieval time, use cases</div>
+      <div class="tile-meta">25 cards · Domain 1</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+
+  <a class="tile" href="sagemaker-algorithms-flashcards.html">
+    <div class="tile-icon">🤖</div>
+    <div class="tile-content">
+      <div class="tile-title">SageMaker Built-in Algorithms</div>
+      <div class="tile-desc">What each algorithm does · when to use it</div>
+      <div class="tile-meta">24 cards · Domain 3</div>
+    </div>
+    <div class="tile-arrow">›</div>
+  </a>
+
+  <div class="tile coming-soon">
+    <div class="tile-icon">➕</div>
+    <div class="tile-content">
+      <div class="tile-title">More decks coming</div>
+      <div class="tile-desc">Evaluation metrics · feature engineering · MLOps services</div>
+      <div class="tile-meta">Coming soon</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
