@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover">
+<title>SageMaker Algorithms — Flashcards</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;display:flex;flex-direction:column;align-items:center;min-height:100vh;min-height:-webkit-fill-available;padding:20px 16px;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+h1{color:#FF9900;font-size:20px;margin-bottom:4px;text-align:center}
+.sub{color:#7a8a9e;font-size:12px;margin-bottom:18px;text-align:center}
+.progress{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap;justify-content:center;max-width:100%}
+.dot{width:10px;height:10px;border-radius:50%;background:#1c2d3f;border:1px solid #2e4058;transition:.3s}
+.dot.active{background:#FF9900;border-color:#FF9900}
+.dot.correct{background:#66d97a;border-color:#66d97a}
+.dot.incorrect{background:#ff6b6b;border-color:#ff6b6b}
+.card-container{perspective:1000px;width:100%;max-width:560px;height:320px;margin-bottom:16px;cursor:pointer}
+.card{width:100%;height:100%;position:relative;transition:transform .5s;transform-style:preserve-3d}
+.card.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.front{background:linear-gradient(135deg,#1a2940,#1e3350);border:2px solid #FF9900}
+.back{background:linear-gradient(135deg,#1a3a2a,#1e4035);border:2px solid #66d97a;transform:rotateY(180deg)}
+.card-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#FF9900;margin-bottom:10px;flex-shrink:0}
+.back .card-label{color:#66d97a}
+.card-question{font-size:18px;font-weight:700;line-height:1.4}
+.card-answer{font-size:13px;line-height:1.7;text-align:left;width:100%}
+.card-answer b{color:#FF9900}
+.card-answer .highlight{color:#66d97a;font-weight:600}
+.card-answer .row{margin:4px 0}
+.card-answer .tag{display:inline-block;background:rgba(255,153,0,0.15);color:#FF9900;padding:2px 8px;border-radius:10px;font-size:11px;margin:2px 4px 2px 0;font-weight:600}
+.hint{font-size:11px;color:#5a6a7e;margin-top:12px;font-style:italic;flex-shrink:0}
+.controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:560px}
+button{background:#1c2d3f;border:1px solid #2e4058;color:#e0e0e0;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;transition:.2s;-webkit-user-select:none;user-select:none}
+button:active{background:#2a3a4e;border-color:#FF9900}
+.btn-primary{background:#FF9900;color:#000;font-weight:700;border-color:#FF9900}
+.btn-primary:active{background:#e88a00}
+.score{color:#7a8a9e;font-size:13px;margin-bottom:6px}
+.tracker{display:flex;gap:16px;margin-bottom:12px}
+.tracker span{font-size:13px}
+.tracker .right{color:#66d97a}
+.tracker .wrong{color:#ff6b6b}
+.shuffle-note{color:#5a6a7e;font-size:11px}
+.back-link{position:absolute;top:20px;left:16px;color:#7a8a9e;text-decoration:none;font-size:13px}
+.back-link:hover{color:#FF9900}
+@media(max-width:430px){
+  body{padding:16px 12px}
+  h1{font-size:17px}
+  .card-container{height:320px}
+  .card-face{padding:16px}
+  .card-question{font-size:16px}
+  .card-answer{font-size:12px}
+  .controls{gap:6px}
+  button{padding:10px 10px;font-size:12px;flex:1;min-width:0}
+  .back-link{top:14px;left:10px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="index.html">‹ Hub</a>
+<h1>SageMaker Built-in Algorithms</h1>
+<div class="sub">Know what exists · know what each one does</div>
+
+<div class="progress" id="progress"></div>
+<div class="score" id="score">Card 1 of 24</div>
+<div class="tracker">
+  <span class="right" id="rightCount">✓ 0</span>
+  <span class="wrong" id="wrongCount">✗ 0</span>
+</div>
+
+<div class="card-container" id="cardContainer">
+  <div class="card" id="card">
+    <div class="card-face front">
+      <div class="card-label">Question</div>
+      <div class="card-question" id="question"></div>
+      <div class="hint">Tap / swipe to flip</div>
+    </div>
+    <div class="card-face back">
+      <div class="card-label">Answer</div>
+      <div class="card-answer" id="answer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="markCard('incorrect')">✗ Didn't Know</button>
+  <button onclick="markCard('correct')">✓ Got It</button>
+  <button onclick="next()">Next →</button>
+</div>
+<button class="btn-primary" onclick="shuffle()">🔀 Shuffle & Reset</button>
+<div class="shuffle-note">Shuffle to randomize card order</div>
+
+<script>
+const cards=[
+{q:"What is XGBoost used for?",a:"<b>Supervised learning on tabular data</b><div class='row'><span class='tag'>Classification</span><span class='tag'>Regression</span><span class='tag'>Ranking</span></div>Gradient-boosted decision trees. <span class='highlight'>Dominates tabular ML competitions</span>. Handles missing values natively. Key hyperparams: <b>max_depth, eta, num_round, subsample</b>."},
+{q:"What is Linear Learner used for?",a:"<b>Linear regression and binary/multiclass classification at scale</b><div class='row'><span class='tag'>Classification</span><span class='tag'>Regression</span></div>Optimized for <span class='highlight'>very high-dimensional sparse data</span>. Can train multiple models in parallel and pick the best. Think: logistic regression but distributed."},
+{q:"What is K-Means used for?",a:"<b>Unsupervised clustering</b><div class='row'><span class='tag'>Clustering</span></div>Groups similar data points into K clusters. Use when you need to segment customers, find patterns in unlabeled data. Must specify K upfront."},
+{q:"What is PCA used for?",a:"<b>Dimensionality reduction</b><div class='row'><span class='tag'>Unsupervised</span></div>Principal Component Analysis. Projects high-dim data onto fewer dimensions while preserving variance. Use before other algorithms or for <span class='highlight'>visualization</span>. Linear only."},
+{q:"What is Random Cut Forest (RCF) used for?",a:"<b>Anomaly detection</b><div class='row'><span class='tag'>Unsupervised</span><span class='tag'>Anomaly</span></div>Detects anomalies in numerical data. Assigns an <span class='highlight'>anomaly score</span> to each point. Use for fraud detection, equipment failures, traffic anomalies."},
+{q:"What is BlazingText used for?",a:"<b>Word embeddings and text classification</b><div class='row'><span class='tag'>NLP</span></div>Two modes: <b>Word2Vec</b> (creates word embeddings) and <b>Text Classification</b>. Highly optimized — much faster than standard implementations."},
+{q:"What is Object2Vec used for?",a:"<b>General-purpose embedding for pairs of objects</b><div class='row'><span class='tag'>Embeddings</span></div>Learns <span class='highlight'>low-dim embeddings of high-dim objects</span>. Use for: recommendation (user↔item), sentence similarity, document classification."},
+{q:"What is DeepAR used for?",a:"<b>Time series forecasting</b><div class='row'><span class='tag'>Forecasting</span><span class='tag'>RNN</span></div>RNN-based algorithm that trains on <span class='highlight'>many related time series simultaneously</span>. Beats classical methods (ARIMA) when you have multiple related series. Supports probabilistic forecasts."},
+{q:"What is Seq2Seq used for?",a:"<b>Sequence-to-sequence tasks</b><div class='row'><span class='tag'>NLP</span><span class='tag'>RNN</span></div>Encoder-decoder architecture. Use for: <span class='highlight'>machine translation, text summarization, speech-to-text</span>. Input sequence → output sequence."},
+{q:"What is Image Classification used for?",a:"<b>Classify whole images into categories</b><div class='row'><span class='tag'>Computer Vision</span></div>ResNet-based. Input: image. Output: <span class='highlight'>single label</span> for the entire image. Supports transfer learning from ImageNet."},
+{q:"What is Object Detection used for?",a:"<b>Find objects in images with bounding boxes</b><div class='row'><span class='tag'>Computer Vision</span></div>Input: image. Output: <span class='highlight'>labels + bounding box coordinates</span> for each detected object. Uses SSD (Single Shot Detector) with VGG or ResNet."},
+{q:"What is Semantic Segmentation used for?",a:"<b>Per-pixel image classification</b><div class='row'><span class='tag'>Computer Vision</span></div>Input: image. Output: <span class='highlight'>a label for every pixel</span>. Use for: medical imaging, autonomous driving (lane detection), satellite imagery."},
+{q:"What is Factorization Machines used for?",a:"<b>Classification/regression with sparse data</b><div class='row'><span class='tag'>Recommendation</span></div>Extension of linear models for <span class='highlight'>high-dimensional sparse datasets</span>. Common use: <b>recommendation systems</b>, click-through-rate prediction."},
+{q:"What is K-Nearest Neighbors (k-NN) used for?",a:"<b>Classification and regression based on similarity</b><div class='row'><span class='tag'>Classification</span><span class='tag'>Regression</span></div>Finds the K closest data points and uses their labels. Good for: <span class='highlight'>classification where decision boundary is complex</span>. No training phase really — lazy learning."},
+{q:"What is LDA (Latent Dirichlet Allocation) used for?",a:"<b>Topic modeling on text</b><div class='row'><span class='tag'>NLP</span><span class='tag'>Unsupervised</span></div>Discovers <span class='highlight'>abstract topics</span> in a collection of documents. Each document = mixture of topics. Each topic = distribution over words."},
+{q:"What is Neural Topic Model (NTM) used for?",a:"<b>Topic modeling using neural networks</b><div class='row'><span class='tag'>NLP</span><span class='tag'>Unsupervised</span></div>Same goal as LDA but uses neural nets. Often produces <span class='highlight'>more coherent topics</span> than LDA. Better for large datasets."},
+{q:"What is IP Insights used for?",a:"<b>Detect unusual IP-to-entity associations</b><div class='row'><span class='tag'>Anomaly</span><span class='tag'>Security</span></div>Learns patterns of IPv4 usage. Flags anomalous activity like: <span class='highlight'>a user logging in from an unusual IP</span>. Use for fraud, account takeover detection."},
+{q:"What is AutoGluon-Tabular used for?",a:"<b>Automated ML for tabular data</b><div class='row'><span class='tag'>AutoML</span></div>Trains and ensembles multiple models (including XGBoost, neural nets) automatically. Good when you want <span class='highlight'>strong baseline quickly</span>."},
+{q:"Which algorithm for customer churn prediction on tabular data?",a:"<b>XGBoost</b> (most common answer)<br><br>Binary classification on structured/tabular data is XGBoost's sweet spot. <span class='highlight'>Linear Learner</span> is acceptable if the data is very sparse or you need interpretable coefficients."},
+{q:"Which algorithm for segmenting customers into groups without labels?",a:"<b>K-Means</b><div class='row'><span class='tag'>Clustering</span></div>Unsupervised problem → clustering → K-Means. Must decide K (number of segments) upfront."},
+{q:"Which algorithm for forecasting product demand across 500 SKUs?",a:"<b>DeepAR</b><br><br>Multiple related time series → DeepAR shines. It learns patterns <span class='highlight'>across all SKUs simultaneously</span>, better than running 500 separate ARIMA models."},
+{q:"Which algorithm for detecting fraud in credit card transactions?",a:"Two options depending on framing:<br><br><b>Random Cut Forest</b> — if the task is 'detect anomalies' (unsupervised)<br><b>XGBoost</b> — if you have labeled fraud/not-fraud data (supervised, with class imbalance handling)"},
+{q:"Which algorithm for finding tumors in medical images?",a:"<b>Semantic Segmentation</b><br><br>'Where exactly is the tumor?' → per-pixel labels. If only 'is there a tumor?' → Image Classification. If 'multiple tumors, where are they?' → Object Detection."},
+{q:"Which algorithm for building a product recommendation engine?",a:"Two strong candidates:<br><br><b>Factorization Machines</b> — classic for recommendation with sparse user-item matrix<br><b>Object2Vec</b> — learns embeddings of users and items, great for similarity-based recs"}
+];
+
+let current=0,right=0,wrong=0,results=[];
+
+function init(){
+  results=cards.map(()=>null);
+  renderDots();
+  show();
+}
+
+function renderDots(){
+  const p=document.getElementById('progress');
+  p.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===current?' active':'')+(results[i]==='correct'?' correct':'')+(results[i]==='incorrect'?' incorrect':'');
+    d.onclick=()=>{current=i;unflip();show()};
+    p.appendChild(d);
+  });
+}
+
+function show(){
+  document.getElementById('question').innerHTML=cards[current].q;
+  document.getElementById('answer').innerHTML=cards[current].a;
+  document.getElementById('score').textContent=`Card ${current+1} of ${cards.length}`;
+  document.getElementById('rightCount').textContent=`✓ ${right}`;
+  document.getElementById('wrongCount').textContent=`✗ ${wrong}`;
+  renderDots();
+}
+
+function unflip(){document.getElementById('card').classList.remove('flipped')}
+
+document.getElementById('cardContainer').onclick=()=>{
+  document.getElementById('card').classList.toggle('flipped');
+};
+
+function next(){if(current<cards.length-1){current++;unflip();show()}}
+function prev(){if(current>0){current--;unflip();show()}}
+
+function markCard(result){
+  if(results[current]===null){
+    if(result==='correct')right++;else wrong++;
+  }else{
+    if(results[current]==='correct'&&result==='incorrect'){right--;wrong++}
+    if(results[current]==='incorrect'&&result==='correct'){wrong--;right++}
+  }
+  results[current]=result;
+  show();
+  if(current<cards.length-1)setTimeout(()=>{next()},300);
+}
+
+function shuffle(){
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]]}
+  current=0;right=0;wrong=0;results=cards.map(()=>null);unflip();show();
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight')next();
+  if(e.key==='ArrowLeft')prev();
+  if(e.key===' '){e.preventDefault();document.getElementById('card').classList.toggle('flipped')}
+});
+
+let touchStartX=0,touchStartY=0;
+document.getElementById('cardContainer').addEventListener('touchstart',e=>{
+  touchStartX=e.changedTouches[0].screenX;
+  touchStartY=e.changedTouches[0].screenY;
+},{passive:true});
+document.getElementById('cardContainer').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].screenX-touchStartX;
+  const dy=e.changedTouches[0].screenY-touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
+    if(dx<0)next();else prev();
+    e.preventDefault();
+  }
+});
+
+init();
+</script>
+</body>
+</html>

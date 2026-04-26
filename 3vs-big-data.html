@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 3 V's of Big Data</title>
+<style>
+  body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; background: #1a1a2e; color: #eee; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+  .container { position: relative; width: 900px; height: 750px; }
+  h1 { text-align: center; font-size: 28px; margin: 0 0 10px; color: #fff; }
+  .subtitle { text-align: center; font-size: 14px; color: #888; margin-bottom: 30px; }
+  .center-circle { position: absolute; top: 260px; left: 370px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, #2a2a4a, #1a1a2e); border: 3px solid #555; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; z-index: 10; }
+  .v-card { position: absolute; width: 260px; border-radius: 16px; padding: 24px; transition: transform 0.3s, box-shadow 0.3s; }
+  .v-card:hover { transform: scale(1.05); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .v-card h2 { margin: 0 0 4px; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+  .v-card .question { font-style: italic; opacity: 0.8; margin-bottom: 14px; font-size: 13px; }
+  .v-card ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.8; }
+  .v-card .aws { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.15); font-size: 12px; }
+  .v-card .aws span { font-weight: bold; }
+  .volume { top: 60px; left: 20px; background: linear-gradient(135deg, #1e3a5f, #16213e); border: 2px solid #4a90d9; }
+  .volume h2 { color: #6cb4ee; }
+  .velocity { top: 60px; right: 20px; background: linear-gradient(135deg, #1e4d2e, #16302a); border: 2px solid #4caf50; }
+  .velocity h2 { color: #66d97a; }
+  .variety { bottom: 40px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #4a3a1e, #302a16); border: 2px solid #d6a636; }
+  .variety:hover { transform: translateX(-50%) scale(1.05); }
+  .variety h2 { color: #f0c850; }
+  .icon { font-size: 28px; }
+  .line { position: absolute; z-index: 1; }
+  svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a href="index.html" style="color:#7a8a9e;text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px">‹ Hub</a>
+  <h1>The 3 V's of Big Data</h1>
+  <div class="subtitle">Core dimensions that define big data challenges — and the AWS services that address them</div>
+
+  <svg viewBox="0 0 900 750">
+    <line x1="280" y1="220" x2="400" y2="300" stroke="#4a90d9" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"/>
+    <line x1="620" y1="220" x2="500" y2="300" stroke="#4caf50" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"/>
+    <line x1="450" y1="420" x2="450" y2="480" stroke="#d6a636" stroke-width="2" stroke-dasharray="6,4" opacity="0.5"/>
+  </svg>
+
+  <div class="center-circle">BIG DATA</div>
+
+  <div class="v-card volume">
+    <h2><span class="icon">📦</span> VOLUME</h2>
+    <div class="question">How much data?</div>
+    <ul>
+      <li>Scale: GBs → TBs → PBs</li>
+      <li>Logs, transactions, sensors</li>
+      <li>Social media, clickstreams</li>
+      <li>Growing exponentially over time</li>
+    </ul>
+    <div class="aws"><span>AWS →</span> S3, Redshift, Glue, EMR, Athena</div>
+  </div>
+
+  <div class="v-card velocity">
+    <h2><span class="icon">⚡</span> VELOCITY</h2>
+    <div class="question">How fast does it arrive?</div>
+    <ul>
+      <li><strong>Batch:</strong> hourly / daily</li>
+      <li><strong>Near real-time:</strong> minutes</li>
+      <li><strong>Real-time:</strong> sub-second</li>
+      <li>Streaming vs scheduled ingestion</li>
+    </ul>
+    <div class="aws"><span>AWS →</span> Kinesis Streams, Firehose, MSK, Lambda</div>
+  </div>
+
+  <div class="v-card variety">
+    <h2><span class="icon">🔀</span> VARIETY</h2>
+    <div class="question">What types of data?</div>
+    <ul>
+      <li><strong>Structured:</strong> tables, CSV, RDS</li>
+      <li><strong>Semi-structured:</strong> JSON, XML, logs</li>
+      <li><strong>Unstructured:</strong> images, video, free text</li>
+      <li>Schema evolution and format conversion</li>
+    </ul>
+    <div class="aws"><span>AWS →</span> S3 (all types), Glue Data Catalog, OpenSearch</div>
+  </div>
+</div>
+</body>
+</html>

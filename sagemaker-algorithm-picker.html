@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>SageMaker Algorithm Picker</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Segoe UI',system-ui,sans-serif;background:#0f1923;color:#e0e0e0;padding:20px 16px;max-width:720px;margin:0 auto;min-height:100vh;min-height:-webkit-fill-available;-webkit-tap-highlight-color:transparent}
+.back-link{color:#7a8a9e;text-decoration:none;font-size:13px;display:inline-block;margin-bottom:12px}
+.back-link:hover{color:#FF9900}
+h1{color:#FF9900;font-size:22px;margin-bottom:4px}
+.sub{color:#7a8a9e;font-size:13px;margin-bottom:20px}
+.stats{display:flex;gap:12px;margin-bottom:16px;font-size:13px}
+.stats .stat{background:#162230;border:1px solid #2a3a4e;border-radius:8px;padding:8px 12px;flex:1;text-align:center}
+.stats .stat b{display:block;font-size:18px;margin-bottom:2px}
+.stats .correct b{color:#66d97a}
+.stats .wrong b{color:#ff6b6b}
+.stats .total b{color:#FF9900}
+.scenario{background:linear-gradient(135deg,#1a2940,#1e3350);border:2px solid #FF9900;border-radius:12px;padding:20px;margin-bottom:16px}
+.scenario-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#FF9900;font-weight:700;margin-bottom:10px}
+.scenario-text{font-size:15px;line-height:1.6;color:#e0e0e0}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.option{background:#162230;border:2px solid #2a3a4e;border-radius:10px;padding:14px 16px;cursor:pointer;transition:.2s;text-align:left;color:#e0e0e0;font-size:14px;font-weight:600}
+.option:hover{border-color:#FF9900}
+.option:active{background:#1c2d3f}
+.option.correct{border-color:#66d97a;background:linear-gradient(135deg,#1a3a2a,#1e4035)}
+.option.wrong{border-color:#ff6b6b;background:linear-gradient(135deg,#3a1a1a,#401e1e)}
+.option.reveal-correct{border-color:#66d97a;background:#1a3a2a;opacity:0.8}
+.option:disabled{cursor:default}
+.explanation{background:#162230;border:1px solid #2a3a4e;border-radius:10px;padding:16px;margin-bottom:16px;display:none}
+.explanation.show{display:block}
+.explanation h3{color:#66d97a;font-size:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.explanation .answer{font-size:15px;color:#66d97a;font-weight:700;margin-bottom:10px}
+.explanation p{font-size:13px;line-height:1.6;color:#c0c8d0;margin-bottom:8px}
+.explanation .why{margin-top:12px;padding-top:12px;border-top:1px solid #2a3a4e}
+.explanation .why h4{font-size:12px;color:#ff6b6b;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.explanation .why-item{font-size:12px;color:#a0a8b0;margin:4px 0;padding-left:14px;position:relative}
+.explanation .why-item::before{content:"✗";color:#ff6b6b;position:absolute;left:0}
+.explanation b{color:#FF9900}
+.controls{display:flex;gap:10px;flex-wrap:wrap}
+button{background:#FF9900;color:#000;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px;flex:1;min-width:140px}
+button:active{background:#e88a00}
+button.secondary{background:#2a3a4e;color:#e0e0e0}
+button.secondary:active{background:#3a4a5e}
+.weak-topics{margin-top:20px;background:#162230;border:1px solid #2a3a4e;border-radius:10px;padding:14px;display:none}
+.weak-topics.show{display:block}
+.weak-topics h3{font-size:13px;color:#ff6b6b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.weak-topics .wt-item{font-size:12px;color:#c0c8d0;padding:4px 0;display:flex;justify-content:space-between}
+.weak-topics .wt-count{color:#ff6b6b;font-weight:700}
+@media(max-width:430px){
+  h1{font-size:20px}
+  .scenario-text{font-size:14px}
+  .option{font-size:13px;padding:12px 14px}
+  button{font-size:13px;padding:10px 14px;min-width:120px}
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="index.html">‹ Hub</a>
+<h1>🎯 Algorithm Picker</h1>
+<div class="sub">Pick the right SageMaker algorithm for the scenario · trains the decision-making muscle</div>
+
+<div class="stats">
+  <div class="stat total"><b id="totalCount">0</b>Attempted</div>
+  <div class="stat correct"><b id="correctCount">0</b>Correct</div>
+  <div class="stat wrong"><b id="wrongCount">0</b>Missed</div>
+</div>
+
+<div class="scenario">
+  <div class="scenario-label">Scenario</div>
+  <div class="scenario-text" id="scenarioText"></div>
+</div>
+
+<div class="options" id="options"></div>
+
+<div class="explanation" id="explanation">
+  <h3>Answer</h3>
+  <div class="answer" id="correctAnswer"></div>
+  <p id="explanationText"></p>
+  <div class="why">
+    <h4>Why not the others?</h4>
+    <div id="whyNot"></div>
+  </div>
+</div>
+
+<div class="controls">
+  <button onclick="newScenario()" id="nextBtn">🎲 Next scenario</button>
+  <button class="secondary" onclick="resetStats()">Reset stats</button>
+</div>
+
+<div class="weak-topics" id="weakTopics">
+  <h3>🔥 Your weak spots</h3>
+  <div id="weakList"></div>
+</div>
+
+<script>
+const scenarios=[
+{
+  s:"A retail company has 3 years of <b>daily sales data for 500 products</b> across 50 stores. They want to predict demand for the next 4 weeks to optimize inventory.",
+  correct:"DeepAR",
+  options:["DeepAR","XGBoost","Linear Learner","Random Cut Forest"],
+  why:{
+    correct:"Multiple related time series → DeepAR learns patterns across all 500 products simultaneously. Much better than training 500 separate models.",
+    wrong:{
+      "XGBoost":"Can do time series but requires heavy feature engineering (lags, seasonality). Not designed for multi-series forecasting.",
+      "Linear Learner":"General classification/regression, not a forecasting algorithm.",
+      "Random Cut Forest":"Anomaly detection, not forecasting."
+    }
+  }
+},
+{
+  s:"A bank wants to detect <b>fraudulent transactions in real-time</b>. They have millions of transactions but only about 0.1% are labeled as fraud.",
+  correct:"XGBoost",
+  options:["XGBoost","K-Means","PCA","Seq2Seq"],
+  why:{
+    correct:"Labeled binary classification on tabular data → XGBoost. Handles severe class imbalance via <b>scale_pos_weight</b>. Fast inference at scale.",
+    wrong:{
+      "K-Means":"Unsupervised clustering — can't use the fraud labels the bank has.",
+      "PCA":"Dimensionality reduction, not a classifier.",
+      "Seq2Seq":"For sequence-to-sequence tasks like translation, not tabular classification."
+    }
+  }
+},
+{
+  s:"A medical imaging startup needs to <b>identify the exact pixels</b> that make up a tumor in MRI scans — not just whether a tumor exists.",
+  correct:"Semantic Segmentation",
+  options:["Semantic Segmentation","Image Classification","Object Detection","K-Means"],
+  why:{
+    correct:"'Exact pixels' → per-pixel classification → <b>Semantic Segmentation</b>. Outputs a label for every pixel in the image.",
+    wrong:{
+      "Image Classification":"Only outputs one label for the whole image. Can't tell where the tumor is.",
+      "Object Detection":"Outputs bounding boxes — rectangles around objects — not exact pixel boundaries.",
+      "K-Means":"Unsupervised clustering, not a vision task."
+    }
+  }
+},
+{
+  s:"A company has <b>unlabeled customer data</b> with 50 features. They want to find natural groupings to create marketing segments.",
+  correct:"K-Means",
+  options:["K-Means","XGBoost","DeepAR","Linear Learner"],
+  why:{
+    correct:"Unlabeled data + grouping = unsupervised clustering → <b>K-Means</b>. You specify K (number of segments) upfront.",
+    wrong:{
+      "XGBoost":"Supervised — needs labels.",
+      "DeepAR":"Time series forecasting.",
+      "Linear Learner":"Supervised classification/regression — needs labels."
+    }
+  }
+},
+{
+  s:"An e-commerce site wants to <b>detect unusual login patterns</b> — logins from unusual IP addresses for a given user.",
+  correct:"IP Insights",
+  options:["IP Insights","XGBoost","K-Means","Random Cut Forest"],
+  why:{
+    correct:"<b>IP Insights</b> is purpose-built for this: it learns which IP addresses are normal for each user/entity and flags anomalies.",
+    wrong:{
+      "XGBoost":"Would work but requires labeled fraud data and extensive feature engineering on IPs.",
+      "K-Means":"Generic clustering — wouldn't understand IP semantics.",
+      "Random Cut Forest":"Anomaly detection on numerical data, but not specialized for IP-entity relationships."
+    }
+  }
+},
+{
+  s:"A company has labeled training images showing <b>multiple products on shelves</b>. They want to identify each product and draw boxes around them for inventory tracking.",
+  correct:"Object Detection",
+  options:["Object Detection","Image Classification","Semantic Segmentation","BlazingText"],
+  why:{
+    correct:"'Identify each product and draw boxes' → <b>Object Detection</b>. Outputs class label + bounding box for each object.",
+    wrong:{
+      "Image Classification":"Only outputs one label per image — can't handle multiple products.",
+      "Semantic Segmentation":"Per-pixel labels — overkill for shelf tracking and more expensive.",
+      "BlazingText":"Text/NLP algorithm, not vision."
+    }
+  }
+},
+{
+  s:"A company has millions of news articles and wants to <b>discover hidden topics</b> in the corpus without any labels.",
+  correct:"LDA",
+  options:["LDA","BlazingText","Seq2Seq","XGBoost"],
+  why:{
+    correct:"'Discover topics without labels' → topic modeling → <b>LDA (Latent Dirichlet Allocation)</b>. NTM is also valid. Each doc becomes a mixture of topics.",
+    wrong:{
+      "BlazingText":"Creates word embeddings or does classification — doesn't discover topics.",
+      "Seq2Seq":"For translation/summarization — needs supervised pairs.",
+      "XGBoost":"Needs labeled data."
+    }
+  }
+},
+{
+  s:"A video streaming service wants to <b>recommend movies to users</b> based on viewing history. User-movie interactions form a very sparse matrix.",
+  correct:"Factorization Machines",
+  options:["Factorization Machines","K-Means","DeepAR","XGBoost"],
+  why:{
+    correct:"Sparse user-item matrix + recommendation → <b>Factorization Machines</b>. Designed exactly for this pattern. Object2Vec is also a valid choice for embedding-based recommendations.",
+    wrong:{
+      "K-Means":"Unsupervised clustering — doesn't produce personalized recommendations.",
+      "DeepAR":"Time series forecasting.",
+      "XGBoost":"Would work but not optimized for extreme sparsity in recommendation."
+    }
+  }
+},
+{
+  s:"A company has sensor data streaming from IoT devices and wants to <b>detect unusual readings</b> that might indicate equipment failure. No labeled failures exist yet.",
+  correct:"Random Cut Forest",
+  options:["Random Cut Forest","XGBoost","IP Insights","K-Means"],
+  why:{
+    correct:"Unsupervised anomaly detection on numerical sensor data → <b>Random Cut Forest (RCF)</b>. Assigns anomaly scores. No labels needed.",
+    wrong:{
+      "XGBoost":"Supervised — needs labeled failures.",
+      "IP Insights":"Specifically for IP-entity relationships, not sensor data.",
+      "K-Means":"Clustering, not anomaly detection. Could be adapted but RCF is purpose-built."
+    }
+  }
+},
+{
+  s:"A startup wants to <b>translate customer support messages from English to Spanish</b>. They have a parallel corpus of 500K translated pairs.",
+  correct:"Seq2Seq",
+  options:["Seq2Seq","BlazingText","LDA","Object2Vec"],
+  why:{
+    correct:"Input sequence → output sequence with paired data → <b>Seq2Seq</b>. Encoder-decoder architecture perfect for translation.",
+    wrong:{
+      "BlazingText":"Creates word embeddings or does single-label classification. Can't generate output sequences.",
+      "LDA":"Topic modeling — doesn't translate.",
+      "Object2Vec":"Learns embeddings for pairs, doesn't generate text."
+    }
+  }
+},
+{
+  s:"A company has a dataset with <b>10,000 features</b> (mostly sparse) and wants to reduce dimensions before training a classifier to speed things up.",
+  correct:"PCA",
+  options:["PCA","XGBoost","K-Means","Factorization Machines"],
+  why:{
+    correct:"Dimensionality reduction before downstream ML → <b>PCA</b>. Projects data onto fewer components while preserving variance.",
+    wrong:{
+      "XGBoost":"Classifier itself — doesn't reduce dimensions.",
+      "K-Means":"Clustering — not dimensionality reduction.",
+      "Factorization Machines":"For supervised learning on sparse data, not a general preprocessing step."
+    }
+  }
+},
+{
+  s:"A company wants to <b>classify news articles</b> into 20 predefined categories. They have 1M labeled articles.",
+  correct:"BlazingText",
+  options:["BlazingText","LDA","Seq2Seq","XGBoost"],
+  why:{
+    correct:"Supervised text classification at scale → <b>BlazingText</b> (Text Classification mode). Very fast, designed for this. XGBoost with TF-IDF features is also valid.",
+    wrong:{
+      "LDA":"Unsupervised topic modeling — can't use labels.",
+      "Seq2Seq":"For sequence generation, not single-label classification.",
+      "XGBoost":"Valid choice but requires manual TF-IDF/embedding feature engineering."
+    }
+  }
+},
+{
+  s:"A real estate company wants to <b>predict house prices</b> based on features like square footage, location, age, and number of rooms.",
+  correct:"XGBoost",
+  options:["XGBoost","K-Means","DeepAR","LDA"],
+  why:{
+    correct:"Tabular regression with mixed feature types → <b>XGBoost</b>. Handles numerical + categorical, non-linear relationships, missing values. Linear Learner is acceptable but usually worse.",
+    wrong:{
+      "K-Means":"Unsupervised clustering — doesn't predict continuous values.",
+      "DeepAR":"Time series forecasting, not cross-sectional regression.",
+      "LDA":"Topic modeling on text."
+    }
+  }
+},
+{
+  s:"A company has <b>billions of sparse features</b> (e.g., ad click prediction with one-hot-encoded user/ad IDs) and needs fast training and inference.",
+  correct:"Linear Learner",
+  options:["Linear Learner","XGBoost","Factorization Machines","K-Means"],
+  why:{
+    correct:"Extremely high-dim sparse data + speed at scale → <b>Linear Learner</b>. Factorization Machines is also excellent here, especially for capturing feature interactions.",
+    wrong:{
+      "XGBoost":"Works but slower than linear models at this scale; tree-based models struggle with extreme sparsity.",
+      "Factorization Machines":"Also valid — this is a close second. Better when interactions between features matter.",
+      "K-Means":"Unsupervised, not for classification."
+    }
+  }
+},
+{
+  s:"A startup wants to <b>generate word embeddings</b> from a corpus of 10M tweets to use as features in downstream models.",
+  correct:"BlazingText",
+  options:["BlazingText","LDA","Object2Vec","Seq2Seq"],
+  why:{
+    correct:"Word embeddings from text corpus → <b>BlazingText (Word2Vec mode)</b>. Produces word vectors. Highly optimized.",
+    wrong:{
+      "LDA":"Produces topic distributions per document, not word embeddings.",
+      "Object2Vec":"Embeds pairs of objects — overkill for single-word embeddings.",
+      "Seq2Seq":"For sequence generation, not embedding."
+    }
+  }
+},
+{
+  s:"A SaaS company needs a <b>strong baseline classifier quickly</b> on a tabular dataset and doesn't want to manually try 10 algorithms.",
+  correct:"AutoGluon-Tabular",
+  options:["AutoGluon-Tabular","XGBoost","Linear Learner","K-Means"],
+  why:{
+    correct:"AutoML framing → <b>AutoGluon-Tabular</b>. Trains and ensembles multiple models automatically. Often matches or beats hand-tuned XGBoost.",
+    wrong:{
+      "XGBoost":"Great but requires you to tune it yourself. AutoGluon will include XGBoost in its ensemble anyway.",
+      "Linear Learner":"Single algorithm, not AutoML.",
+      "K-Means":"Unsupervised clustering."
+    }
+  }
+}
+];
+
+let current=null,stats=JSON.parse(localStorage.getItem('algPickerStats')||'{"total":0,"correct":0,"wrong":0,"byAlg":{}}');
+
+function renderStats(){
+  document.getElementById('totalCount').textContent=stats.total;
+  document.getElementById('correctCount').textContent=stats.correct;
+  document.getElementById('wrongCount').textContent=stats.wrong;
+  const weak=Object.entries(stats.byAlg).filter(([k,v])=>v.wrong>0).sort((a,b)=>b[1].wrong-a[1].wrong).slice(0,5);
+  const wt=document.getElementById('weakTopics');
+  if(weak.length){
+    wt.classList.add('show');
+    document.getElementById('weakList').innerHTML=weak.map(([k,v])=>`<div class="wt-item"><span>${k}</span><span class="wt-count">${v.wrong} missed</span></div>`).join('');
+  }else{
+    wt.classList.remove('show');
+  }
+}
+
+function newScenario(){
+  current=scenarios[Math.floor(Math.random()*scenarios.length)];
+  document.getElementById('scenarioText').innerHTML=current.s;
+  document.getElementById('explanation').classList.remove('show');
+  const opts=document.getElementById('options');
+  opts.innerHTML='';
+  const shuffled=[...current.options].sort(()=>Math.random()-0.5);
+  shuffled.forEach(opt=>{
+    const b=document.createElement('button');
+    b.className='option';
+    b.textContent=opt;
+    b.onclick=()=>select(opt,b);
+    opts.appendChild(b);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function select(picked,btn){
+  const isCorrect=picked===current.correct;
+  stats.total++;
+  if(!stats.byAlg[current.correct])stats.byAlg[current.correct]={correct:0,wrong:0};
+  if(isCorrect){
+    stats.correct++;
+    stats.byAlg[current.correct].correct++;
+    btn.classList.add('correct');
+  }else{
+    stats.wrong++;
+    stats.byAlg[current.correct].wrong++;
+    btn.classList.add('wrong');
+    document.querySelectorAll('.option').forEach(o=>{
+      if(o.textContent===current.correct)o.classList.add('reveal-correct');
+    });
+  }
+  document.querySelectorAll('.option').forEach(o=>o.disabled=true);
+  document.getElementById('correctAnswer').textContent='✓ '+current.correct;
+  document.getElementById('explanationText').innerHTML=current.why.correct;
+  document.getElementById('whyNot').innerHTML=Object.entries(current.why.wrong).map(([k,v])=>`<div class="why-item"><b>${k}:</b> ${v}</div>`).join('');
+  document.getElementById('explanation').classList.add('show');
+  localStorage.setItem('algPickerStats',JSON.stringify(stats));
+  renderStats();
+}
+
+function resetStats(){
+  if(confirm('Reset all stats?')){
+    stats={total:0,correct:0,wrong:0,byAlg:{}};
+    localStorage.setItem('algPickerStats',JSON.stringify(stats));
+    renderStats();
+  }
+}
+
+renderStats();
+newScenario();
+</script>
+</body>
+</html>
