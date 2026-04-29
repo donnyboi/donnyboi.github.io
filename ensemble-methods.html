@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Ensemble Methods — Bagging vs Boosting vs Stacking</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1923;--panel:#162230;--border:#2a3a4e;--text:#e0e0e0;--muted:#7a8a9e;
+  --orange:#FF9900;--blue:#56b8ff;--green:#66d97a;--yellow:#f0c850;--red:#ff6b6b;--purple:#c792ea;
+}
+body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);max-width:900px;margin:0 auto;-webkit-text-size-adjust:100%}
+.back-link{color:var(--muted);text-decoration:none;font-size:13px;display:inline-block;margin:16px 0}
+.back-link:hover{color:var(--orange)}
+.hero{padding:20px 0 30px;border-bottom:1px solid var(--border);margin-bottom:30px}
+.hero .tag{font-size:11px;text-transform:uppercase;letter-spacing:3px;color:var(--orange);font-weight:700;margin-bottom:8px}
+.hero h1{font-size:32px;font-weight:800;background:linear-gradient(135deg,var(--orange),#ffb347);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;line-height:1.15}
+.hero .subtitle{font-size:16px;color:var(--muted);font-weight:300}
+
+.section{margin-bottom:36px}
+h2{font-size:22px;color:var(--text);margin-bottom:14px;font-weight:700}
+h3{font-size:17px;color:var(--blue);margin:18px 0 10px;font-weight:600}
+p{color:#c0c8d0;margin-bottom:12px}
+
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:14px;border-left:4px solid var(--orange)}
+.card.bag{border-left-color:var(--green)}
+.card.boost{border-left-color:var(--orange)}
+.card.stack{border-left-color:var(--purple)}
+.card h3{margin-top:0;color:var(--text)}
+.card .subtitle{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:10px}
+.card .key{color:var(--orange);font-weight:600}
+.card.bag .key{color:var(--green)}
+.card.stack .key{color:var(--purple)}
+
+/* Table */
+.table-wrap{overflow-x:auto;margin:16px 0;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px;background:var(--panel);border-radius:8px;overflow:hidden;min-width:600px}
+th{background:#1c2d3f;color:var(--orange);padding:10px 12px;text-align:left;font-weight:700;text-transform:uppercase;font-size:10px;letter-spacing:1px;border-bottom:1px solid var(--border)}
+th:first-child{color:var(--muted)}
+td{padding:10px 12px;border-top:1px solid var(--border);color:#c0c8d0;vertical-align:top}
+td:first-child{color:var(--text);font-weight:600;white-space:nowrap}
+tbody tr:hover{background:#1c2d3f}
+
+/* Mental model callouts */
+.model-box{background:linear-gradient(135deg,var(--panel),#1e3350);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin:10px 0;display:flex;gap:12px;align-items:flex-start}
+.model-box .icon{font-size:28px;flex-shrink:0}
+.model-box .content{flex:1}
+.model-box .name{font-size:14px;font-weight:700;color:var(--orange);margin-bottom:4px}
+.model-box .name.bag{color:var(--green)}
+.model-box .name.stack{color:var(--purple)}
+.model-box .desc{font-size:13px;color:#c0c8d0;line-height:1.5}
+
+/* When to use */
+.use-case{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.use-case .scenario{font-size:13px;color:var(--muted);font-style:italic;margin-bottom:6px}
+.use-case .answer{font-size:14px;color:var(--text)}
+.use-case .answer b{color:var(--orange)}
+
+.memory{background:linear-gradient(135deg,#1a3a2a,#1e4035);border:1px solid var(--green);border-radius:12px;padding:18px;margin:20px 0}
+.memory h3{color:var(--green);margin-top:0}
+.memory ul{list-style:none;padding:0}
+.memory li{padding:6px 0;color:#c0c8d0;font-size:14px}
+.memory li b{color:var(--green);font-size:15px}
+
+code{background:#0a1420;padding:2px 6px;border-radius:4px;color:var(--orange);font-family:'SF Mono',Menlo,monospace;font-size:13px}
+
+.exam-note{background:linear-gradient(135deg,rgba(255,153,0,0.08),rgba(86,184,255,0.05));border:1px solid var(--border);border-radius:10px;padding:16px;margin:12px 0;border-left:4px solid var(--yellow)}
+.exam-note .label{font-size:11px;color:var(--yellow);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-bottom:4px}
+
+@media(max-width:500px){
+  .hero h1{font-size:26px}
+  h2{font-size:19px}
+  table{font-size:12px}
+  th,td{padding:8px 10px}
+}
+</style>
+</head>
+<body>
+<a class="back-link" href="index.html">‹ Hub</a>
+
+<div class="hero">
+  <div class="tag">Domain 3 · Model Development</div>
+  <h1>Ensemble Methods</h1>
+  <div class="subtitle">Bagging, Boosting, Stacking — what they do, when to use them, how they differ</div>
+</div>
+
+<div class="section">
+  <h2>The core idea</h2>
+  <p>A single model has limits. Ensemble methods combine <b>multiple models</b> to produce predictions that are more accurate and more robust than any individual model could be. There are three main flavours — each solves a different problem.</p>
+</div>
+
+<div class="section">
+  <h2>The three families</h2>
+
+  <div class="card bag">
+    <h3>🌳 Bagging — Bootstrap Aggregating</h3>
+    <div class="subtitle">Parallel democracy of clones</div>
+    <p>Train <b>many copies of the same model</b> on different random subsets of the data (called <b>bootstrap samples</b>). Each model votes, and you take the <span class="key">average</span> or <span class="key">majority vote</span>.</p>
+    <p><b>Goal:</b> reduce <b>variance</b> (overfitting). If one model overfits a weird quirk in its subset, the others will outvote it.</p>
+    <p><b>Famous example:</b> <code>Random Forest</code> = bagging applied to decision trees.</p>
+  </div>
+
+  <div class="card boost">
+    <h3>🚀 Boosting — Sequential Error Correction</h3>
+    <div class="subtitle">Team of specialists fixing each other's mistakes</div>
+    <p>Train models <b>one at a time, sequentially</b>. Each new model focuses on what previous models got wrong. Final prediction is a <span class="key">weighted sum</span> of all models.</p>
+    <p><b>Goal:</b> reduce <b>bias</b> (underfitting). Each model targets the remaining errors until the ensemble fits the data well.</p>
+    <p><b>Famous examples:</b> <code>XGBoost</code>, <code>LightGBM</code>, <code>AdaBoost</code>, <code>Gradient Boosting</code>.</p>
+  </div>
+
+  <div class="card stack">
+    <h3>🏛️ Stacking — Meta-Learning</h3>
+    <div class="subtitle">Expert panel with a judge</div>
+    <p>Train <b>different types of models</b> (e.g., XGBoost + Neural Net + Logistic Regression) on the same data. Feed their predictions as features into a <span class="key">meta-model</span> that learns how to best combine them.</p>
+    <p><b>Goal:</b> capture <b>diverse strengths</b>. Different algorithms excel at different patterns; stacking blends their strengths.</p>
+    <p><b>Famous example:</b> How most Kaggle competitions get won.</p>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Side-by-side comparison</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th></th><th>Bagging</th><th>Boosting</th><th>Stacking</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>How it trains</td><td>Parallel — many copies at once</td><td>Sequential — each fixes previous</td><td>Parallel — different algorithms</td></tr>
+        <tr><td>Model types</td><td>Same type (usually trees)</td><td>Same type (usually trees)</td><td>Different types mixed</td></tr>
+        <tr><td>Training data</td><td>Random subset per model</td><td>Full data, reweighted errors</td><td>Same data, all models</td></tr>
+        <tr><td>How predictions combine</td><td>Vote / average</td><td>Weighted sum</td><td>Meta-model learns combination</td></tr>
+        <tr><td>Reduces...</td><td>Variance (overfitting)</td><td>Bias (underfitting)</td><td>Both — combines strengths</td></tr>
+        <tr><td>Overfitting risk</td><td>Low</td><td>High if over-trained</td><td>Moderate</td></tr>
+        <tr><td>Parallelizable?</td><td>✅ Yes</td><td>❌ No (sequential)</td><td>✅ Yes (base models)</td></tr>
+        <tr><td>Speed</td><td>Fast</td><td>Slower</td><td>Slowest</td></tr>
+        <tr><td>Famous example</td><td>Random Forest</td><td>XGBoost</td><td>Kaggle winners</td></tr>
+        <tr><td>SageMaker built-in?</td><td>—</td><td>✅ XGBoost</td><td>— (custom)</td></tr>
+        <tr><td>Best for</td><td>Noisy data, anti-overfit</td><td>Tabular, max accuracy</td><td>Squeezing last %</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Mental models</h2>
+
+  <div class="model-box">
+    <div class="icon">🗳️</div>
+    <div class="content">
+      <div class="name bag">Bagging — Election</div>
+      <div class="desc">Hundreds of identical voters, each hearing a slightly different version of the facts. Majority rules. One misinformed voter gets drowned out.</div>
+    </div>
+  </div>
+
+  <div class="model-box">
+    <div class="icon">🏥</div>
+    <div class="content">
+      <div class="name">Boosting — Medical Specialist Chain</div>
+      <div class="desc">GP diagnoses → cardiologist refines → surgeon handles what they couldn't. Each specialist focuses on what the previous couldn't solve. Errors accumulate into corrections.</div>
+    </div>
+  </div>
+
+  <div class="model-box">
+    <div class="icon">⚖️</div>
+    <div class="content">
+      <div class="name stack">Stacking — Expert Panel + Judge</div>
+      <div class="desc">A doctor, an engineer, and a lawyer each give their verdict on a complex case. A judge listens to all three and makes the final call based on who tends to be right in this kind of situation.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>When to use which</h2>
+
+  <div class="use-case">
+    <div class="scenario">"Data is noisy and my single model is overfitting"</div>
+    <div class="answer">→ Use <b>Bagging</b> (Random Forest) to reduce variance</div>
+  </div>
+
+  <div class="use-case">
+    <div class="scenario">"Tabular data classification, I want max accuracy"</div>
+    <div class="answer">→ Use <b>Boosting</b> (XGBoost) — dominant on structured data</div>
+  </div>
+
+  <div class="use-case">
+    <div class="scenario">"My best single model is XGBoost but I need a bit more performance"</div>
+    <div class="answer">→ Try <b>Stacking</b> with XGBoost + a neural net + linear model</div>
+  </div>
+
+  <div class="use-case">
+    <div class="scenario">"I need interpretable predictions"</div>
+    <div class="answer">→ Prefer <b>Bagging</b> (feature importances work naturally; avoid stacking)</div>
+  </div>
+
+  <div class="use-case">
+    <div class="scenario">"I have millions of rows and need fast training"</div>
+    <div class="answer">→ <b>Bagging</b> or <b>LightGBM</b> (boosting variant designed for scale)</div>
+  </div>
+
+  <div class="use-case">
+    <div class="scenario">"Small dataset, underfitting"</div>
+    <div class="answer">→ <b>Boosting</b> — it reduces bias, which is what you need</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Key XGBoost hyperparameters (exam-relevant)</h2>
+  <div class="card boost">
+    <p><code>num_round</code> — number of boosting rounds (trees). More = better fit but risk overfitting.</p>
+    <p><code>eta</code> — learning rate. Lower means slower but more stable training. Typical 0.01–0.3.</p>
+    <p><code>max_depth</code> — tree depth. Deeper captures more interactions but overfits.</p>
+    <p><code>subsample</code> — fraction of rows per tree (adds randomness like bagging).</p>
+    <p><code>scale_pos_weight</code> — handles class imbalance.</p>
+  </div>
+</div>
+
+<div class="memory">
+  <h3>💡 Memory hook</h3>
+  <ul>
+    <li><b>B</b>agging → <b>B</b>ootstrap (random samples, parallel)</li>
+    <li><b>B</b>oosting → <b>B</b>uilds on mistakes (sequential)</li>
+    <li><b>S</b>tacking → <b>S</b>pecialists + judge (diverse + meta)</li>
+  </ul>
+</div>
+
+<div class="exam-note">
+  <div class="label">🎯 Exam trigger words</div>
+  <p style="margin:0;font-size:13px"><b>"Reduce overfitting"</b> → Bagging / Random Forest &nbsp;·&nbsp; <b>"Max accuracy on tabular"</b> → XGBoost &nbsp;·&nbsp; <b>"Combine multiple model types"</b> → Stacking &nbsp;·&nbsp; <b>"Imbalanced classification"</b> → XGBoost + <code>scale_pos_weight</code></p>
+</div>
+
+</body>
+</html>
