@@ -117,6 +117,13 @@ body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;
 .cal-day.today{border-color:var(--orange);border-width:2px}
 .cal-day .cal-num{font-size:12px;font-weight:700}
 
+/* Kid selector */
+.kid-bar{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.kid-select{background:var(--bg);border:1px solid var(--border);color:var(--orange);padding:8px 12px;border-radius:10px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;min-width:120px;text-align:center}
+.kid-select:focus{outline:none;border-color:var(--orange)}
+.kid-btn{background:var(--bg);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.kid-btn:active{background:var(--border)}
+
 @media(max-width:430px){
   body{padding:env(safe-area-inset-top) 12px calc(80px + env(safe-area-inset-bottom)) 12px}
   .header h1{font-size:20px}
@@ -129,6 +136,11 @@ body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;
 
 <div class="header">
   <h1>🌟 Goals Tracker</h1>
+  <div class="kid-bar">
+    <select class="kid-select" id="kidSelect" onchange="switchKid(this.value)"></select>
+    <button class="kid-btn" onclick="openAddKid()" title="Add kid">+</button>
+    <button class="kid-btn" onclick="openManageKids()" title="Manage kids">⚙</button>
+  </div>
   <div class="date" id="dateDisplay"></div>
 </div>
 
@@ -226,15 +238,80 @@ body{font-family:-apple-system,'Segoe UI','Helvetica Neue',system-ui,sans-serif;
 
 <script>
 const EMOJIS=['📚','🧮','✏️','🎨','🏃','⚽','🚴','🏊','🎵','🎹','🦷','🛁','🧸','🧩','🌱','💤','🥦','💧','📖','🌟','🎯','🏆','💪','🧠','🎪','🎭','🎲','🎮','🍎','🌈'];
-let goals=JSON.parse(localStorage.getItem('kidGoals')||'[]');
-let activity=JSON.parse(localStorage.getItem('kidActivity')||'[]');
+
+// Multi-kid data model
+let kids=JSON.parse(localStorage.getItem('kidsList')||'[]');
+let currentKidId=localStorage.getItem('currentKid')||'';
+
+// Migrate old single-kid data
+if(!kids.length){
+  const oldGoals=JSON.parse(localStorage.getItem('kidGoals')||'[]');
+  const oldActivity=JSON.parse(localStorage.getItem('kidActivity')||'[]');
+  const firstId='kid_'+Date.now().toString(36);
+  kids=[{id:firstId,name:'My Kid'}];
+  currentKidId=firstId;
+  localStorage.setItem('kidsList',JSON.stringify(kids));
+  localStorage.setItem('currentKid',firstId);
+  if(oldGoals.length||oldActivity.length){
+    localStorage.setItem('goals_'+firstId,JSON.stringify(oldGoals));
+    localStorage.setItem('activity_'+firstId,JSON.stringify(oldActivity));
+  }
+}
+if(!currentKidId||!kids.find(k=>k.id===currentKidId)){currentKidId=kids[0].id;localStorage.setItem('currentKid',currentKidId)}
+
+function loadKidData(){
+  goals=JSON.parse(localStorage.getItem('goals_'+currentKidId)||'[]');
+  activity=JSON.parse(localStorage.getItem('activity_'+currentKidId)||'[]');
+}
+let goals=[],activity=[];
+loadKidData();
 let editingId=null,selectedEmoji='🎯',selectedType='daily';
 
 const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 
 function save(){
-  localStorage.setItem('kidGoals',JSON.stringify(goals));
-  localStorage.setItem('kidActivity',JSON.stringify(activity.slice(0,100)));
+  localStorage.setItem('goals_'+currentKidId,JSON.stringify(goals));
+  localStorage.setItem('activity_'+currentKidId,JSON.stringify(activity.slice(0,100)));
+}
+
+function renderKidSelect(){
+  const sel=document.getElementById('kidSelect');
+  sel.innerHTML=kids.map(k=>`<option value="${k.id}"${k.id===currentKidId?' selected':''}>${escape(k.name)}</option>`).join('');
+}
+
+function switchKid(id){
+  currentKidId=id;
+  localStorage.setItem('currentKid',id);
+  loadKidData();
+  render();
+}
+
+function openAddKid(){
+  const name=prompt('Enter kid\'s name:');
+  if(!name||!name.trim())return;
+  const id='kid_'+Date.now().toString(36);
+  kids.push({id,name:name.trim()});
+  localStorage.setItem('kidsList',JSON.stringify(kids));
+  switchKid(id);
+}
+
+function openManageKids(){
+  const kid=kids.find(k=>k.id===currentKidId);
+  const action=prompt(`Managing: ${kid.name}\n\nType "rename" to rename or "delete" to remove this kid:`);
+  if(!action)return;
+  if(action.trim().toLowerCase()==='rename'){
+    const name=prompt('New name:',kid.name);
+    if(name&&name.trim()){kid.name=name.trim();localStorage.setItem('kidsList',JSON.stringify(kids));render();}
+  }else if(action.trim().toLowerCase()==='delete'){
+    if(kids.length<2)return alert('You need at least one kid!');
+    if(confirm(`Delete ${kid.name} and all their goals?`)){
+      localStorage.removeItem('goals_'+kid.id);
+      localStorage.removeItem('activity_'+kid.id);
+      kids=kids.filter(k=>k.id!==kid.id);
+      localStorage.setItem('kidsList',JSON.stringify(kids));
+      switchKid(kids[0].id);
+    }
+  }
 }
 
 function calcStreak(goal){
@@ -258,6 +335,7 @@ function calcStreak(goal){
 function render(){
   const today=todayKey();
   const d=new Date();
+  renderKidSelect();
   document.getElementById('dateDisplay').textContent=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
   
   const activeGoals=goals.filter(g=>!g.archived&&g.type!=='milestone'||(g.type==='milestone'&&!g.completedAt));
@@ -480,12 +558,13 @@ function deleteGoal(){
 }
 
 function exportData(){
-  const data={goals,activity,exported:new Date().toISOString()};
+  const kid=kids.find(k=>k.id===currentKidId);
+  const data={kid:kid.name,goals,activity,exported:new Date().toISOString()};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`goals-backup-${todayKey()}.json`;
+  a.download=`goals-${kid.name.toLowerCase().replace(/\s+/g,'-')}-${todayKey()}.json`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -497,7 +576,7 @@ function importData(e){
   reader.onload=evt=>{
     try{
       const data=JSON.parse(evt.target.result);
-      if(!confirm(`Import ${data.goals?.length||0} goals? This replaces current data.`))return;
+      if(!confirm(`Import ${data.goals?.length||0} goals for ${kids.find(k=>k.id===currentKidId).name}? This replaces their current data.`))return;
       goals=data.goals||[];
       activity=data.activity||[];
       save();render();
@@ -519,7 +598,7 @@ function timeAgo(ts){
 function escape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
 // Seed examples if first time
-if(!localStorage.getItem('kidGoals')){
+if(!localStorage.getItem('goals_'+currentKidId)&&!goals.length){
   goals=[
     {id:'seed1',title:'Brush teeth twice',icon:'🦷',type:'daily',completions:[],createdAt:Date.now()},
     {id:'seed2',title:'Read 10 books',icon:'📚',type:'counter',target:10,count:0,createdAt:Date.now()},
