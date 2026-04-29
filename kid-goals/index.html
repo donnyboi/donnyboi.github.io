@@ -254,6 +254,7 @@ if(!currentKidId||!kids.find(k=>k.id===currentKidId)){currentKidId=kids[0].id;lo
 function loadKidData(){goals=JSON.parse(localStorage.getItem('goals_'+currentKidId)||'[]');activity=JSON.parse(localStorage.getItem('activity_'+currentKidId)||'[]')}
 let goals=[],activity=[];loadKidData();
 let editingId=null,selectedEmoji='🎯',selectedType='daily';
+const expanded=new Set();
 const todayKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
 function save(){localStorage.setItem('goals_'+currentKidId,JSON.stringify(goals));localStorage.setItem('activity_'+currentKidId,JSON.stringify(activity.slice(0,100)))}
 function renderKidSelect(){document.getElementById('kidSelect').innerHTML=kids.map(k=>`<option value="${k.id}"${k.id===currentKidId?' selected':''}>${esc(k.name)}</option>`).join('')}
@@ -263,8 +264,8 @@ function openManageKids(){const k=kids.find(k=>k.id===currentKidId);const a=prom
 function calcStreak(g){if(g.type!=='daily'||!g.completions||!g.completions.length)return 0;const sd=[...new Set(g.completions)].sort().reverse();let s=0,d=new Date();for(let i=0;i<365;i++){const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;if(sd.includes(k)){s++;d.setDate(d.getDate()-1)}else{if(i===0){d.setDate(d.getDate()-1);continue}break}}return s}
 
 function goalHeatmap(g){
-  if(g.type!=='daily'||!g.completions||!g.completions.length)return '';
-  const weeks=13,today=new Date(),comps=new Set(g.completions);
+  if(g.type!=='daily')return '';
+  const weeks=13,today=new Date(),comps=new Set(g.completions||[]);
   const start=new Date(today);start.setDate(start.getDate()-(weeks*7-1));start.setDate(start.getDate()-start.getDay());
   let html='',mhtml='',lastM=-1,wc=0;const d=new Date(start);
   while(d<=today||d.getDay()!==0){
@@ -273,9 +274,9 @@ function goalHeatmap(g){
     if(ws.getMonth()!==lastM){mhtml+=`<span style="position:absolute;left:${wc*17}px">${ws.toLocaleString('en',{month:'short'})}</span>`;lastM=ws.getMonth()}
     html+=`<div class="hm-week">${wk}</div>`;wc++;
   }
-  return `<div class="heatmap" id="hm_${g.id}" style="display:none"><div class="heatmap-title">Last ${weeks} weeks</div><div class="heatmap-months"><div style="position:relative;width:${wc*17}px;height:14px">${mhtml}</div></div><div class="heatmap-grid">${html}</div><div class="heatmap-legend">Miss <div class="hm-cell"></div><div class="hm-cell l4"></div> Done</div></div>`;
+  return `<div class="heatmap" id="hm_${g.id}" style="display:${expanded.has(g.id)?'block':'none'}"><div class="heatmap-title">Last ${weeks} weeks</div><div class="heatmap-months"><div style="position:relative;width:${wc*17}px;height:14px">${mhtml}</div></div><div class="heatmap-grid">${html}</div><div class="heatmap-legend">Miss <div class="hm-cell"></div><div class="hm-cell l4"></div> Done</div></div>`;
 }
-function toggleHeatmap(id){const el=document.getElementById('hm_'+id);if(el)el.style.display=el.style.display==='none'?'block':'none'}
+function toggleHeatmap(id){if(expanded.has(id))expanded.delete(id);else expanded.add(id);render()}
 
 function render(){
   const today=todayKey(),d=new Date();renderKidSelect();
@@ -308,7 +309,7 @@ function renderGoal(g){
     btn=`<button class="check-btn milestone-btn" onclick="completeMilestone('${g.id}')">🏆</button>`;
     sub=`<span class="type">milestone</span>`;
   }
-  return `<div class="goal ${dt?'done-today':''}" onclick="event.target.closest('button')||toggleHeatmap('${g.id}')" ondblclick="editGoal('${g.id}')"><div class="goal-row"><div class="goal-icon">${g.icon}</div><div class="goal-main"><div class="goal-title">${esc(g.title)}</div><div class="goal-sub">${sub}</div></div><div class="goal-action">${btn}</div></div>${prog}${goalHeatmap(g)}</div>`;
+  return `<div class="goal ${dt?'done-today':''}" onclick="event.target.closest('button')||toggleHeatmap('${g.id}')"><div class="goal-row"><div class="goal-icon">${g.icon}</div><div class="goal-main"><div class="goal-title">${esc(g.title)}</div><div class="goal-sub">${sub}</div></div><div class="goal-action" style="display:flex;gap:6px;align-items:center"><button class="kid-btn" onclick="editGoal('${g.id}')" style="width:32px;height:32px;font-size:14px;border-radius:16px">✎</button>${btn}</div></div>${prog}${goalHeatmap(g)}</div>`;
 }
 function getLast7(g){const c=g.completions||[],t=todayKey(),r=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;r.push({done:c.includes(k),today:k===t,dn:['S','M','T','W','T','F','S'][d.getDay()],num:d.getDate()})}return r}
 
